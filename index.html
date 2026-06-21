@@ -58,7 +58,7 @@ h3{font-size:clamp(1.15rem,2vw,1.4rem)}
 .lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
 .lang button{border:0;background:transparent;padding:7px 13px;font-weight:700;font-size:.76rem;color:var(--slate);transition:.2s}
 .lang button.on{background:var(--navy);color:#fff}
-.btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:.92rem;border-radius:999px;padding:13px 24px;border:1.5px solid transparent;transition:.22s var(--ease);white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:.92rem;border-radius:999px;padding:13px 24px;border:1.5px solid transparent;transition:.22s var(--ease);white-space:nowrap;touch-action:manipulation}
 .btn.pri{background:var(--navy);color:#fff}.btn.pri:hover{background:var(--blue);transform:translateY(-2px);box-shadow:var(--sh-sm)}
 .btn.ghost{background:transparent;color:var(--navy);border-color:var(--navy)}.btn.ghost:hover{background:var(--navy);color:#fff}
 .btn.light{background:#fff;color:var(--navy)}.btn.light:hover{transform:translateY(-2px);box-shadow:0 18px 44px -18px rgba(0,0,0,.5)}
@@ -448,6 +448,16 @@ html[lang="el"] [data-el]{display:revert}
         </dd></div>
         <div><dt>Email</dt><dd><a href="mailto:99propertiesgreece@gmail.com">99propertiesgreece@gmail.com</a></dd></div>
         <div><dt><span data-en>Office</span><span data-el>Γραφείο</span></dt><dd>Olimpias 17A, Glyfada 16561, Greece</dd></div>
+        <div><dt><span data-en>Follow us</span><span data-el>Ακολουθήστε μας</span></dt><dd>
+          <div class="msgs">
+            <a class="msg" href="https://www.instagram.com/99propertiesgreece" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram" style="background:#e1306c;color:#fff">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </a>
+            <a class="msg" href="https://www.facebook.com/99propertiesgreece" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook" style="background:#1877f2;color:#fff">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9.198 21.5h4v-8.01h3.604l.396-3.98h-4V7.5a1 1 0 0 1 1-1h3v-4h-3a5 5 0 0 0-5 5v2.01h-2l-.396 3.98h2.396v8.01Z"/></svg>
+            </a>
+          </div>
+        </dd></div>
       </dl>
       <div class="map"><iframe title="Map of Varkiza" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=23.745%2C37.853%2C23.785%2C37.873&layer=mapnik&marker=37.863%2C23.762"></iframe></div>
     </div>
@@ -480,7 +490,7 @@ html[lang="el"] [data-el]{display:revert}
     <div class="shead rv"><p class="eyebrow">5 facts</p><h2>What the Greek Golden Visa gives you</h2>
       <p class="lead">A residence permit granted to non-EU nationals who make a qualifying investment in Greece — most commonly in real estate. Governed by the Hellenic Republic under Law 4251/2014, as amended.</p></div>
 
-    <div class="fact rv"><div class="no">.01</div><div>
+    <div class="fact rv"><div class="no">01.</div><div>
       <h3>Demand keeps climbing</h3>
       <p>Issuances to investors and their families have grown from a few hundred a year to tens of thousands — Greece is now the last major EU programme offering residency through real estate.</p>
       <div class="chart">
@@ -504,17 +514,17 @@ html[lang="el"] [data-el]{display:revert}
       </div>
     </div></div>
 
-    <div class="fact rv"><div class="no">.02</div><div>
+    <div class="fact rv"><div class="no">02.</div><div>
       <h3>Lowest entry threshold in the EU 🇪🇺</h3>
       <p>A minimum investment of <strong>€250,000</strong> for commercial-to-residential conversions or the restoration of listed buildings — the lowest qualifying threshold of any golden-visa programme in the European Union.</p>
     </div></div>
 
-    <div class="fact rv"><div class="no">.03</div><div>
+    <div class="fact rv"><div class="no">03.</div><div>
       <h3>No relocation, no minimum stay</h3>
       <p>There is no requirement to live in Greece to keep the permit. It is valid for 5 years and renewable for as long as the investment is held.</p>
     </div></div>
 
-    <div class="fact rv"><div class="no">.04</div><div>
+    <div class="fact rv"><div class="no">04.</div><div>
       <h3>You can rent the property</h3>
       <p>You can lease your property on a long-term basis, creating a stable, passive income stream while you keep the Golden Visa.</p>
       <div class="callout" style="margin-top:18px">
@@ -523,7 +533,7 @@ html[lang="el"] [data-el]{display:revert}
       </div>
     </div></div>
 
-    <div class="fact rv"><div class="no">.05</div><div>
+    <div class="fact rv"><div class="no">05.</div><div>
       <h3>Family inclusion — a 3-generation policy</h3>
       <p>A single investment covers the main applicant, their spouse (or registered partner), children up to 21 (or up to 24 in some cases), and the parents of both spouses.</p>
     </div></div>
@@ -615,7 +625,7 @@ html[lang="el"] [data-el]{display:revert}
   document.querySelectorAll('[data-go]').forEach(function(a){
     a.addEventListener('click',function(e){
       var go=a.dataset.go, hash=a.getAttribute('href');
-      if(go==='gv'){e.preventDefault();show('gv');window.scrollTo(0,0);return;}
+      if(go==='gv'){e.preventDefault();e.stopPropagation();show('gv');window.scrollTo(0,0);return false;}
       // go to site
       if(gv.hidden===false){ // currently on GV -> switch, then jump to anchor
         show('site');
