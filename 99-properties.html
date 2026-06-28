@@ -652,7 +652,7 @@ html[lang="el"] [data-el]{display:revert}
   // Web3Forms submission handled natively via <form> tag
   var formEl=document.querySelector('form[action*="web3forms"]');
   if(formEl){formEl.addEventListener("submit",function(){var btn=document.getElementById("send");if(btn){setTimeout(function(){btn.textContent="Sent! We'll be in touch.";},200);}});}
-
+})();
 
 
 
