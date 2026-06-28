@@ -451,12 +451,15 @@ html[lang="el"] [data-el]{display:revert}
       </dl>
       <div class="map"><iframe title="Map of Varkiza" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=23.745%2C37.853%2C23.785%2C37.873&layer=mapnik&marker=37.863%2C23.762"></iframe></div>
     </div>
+<form action="https://api.web3forms.com/submit" method="POST">
+<input type="hidden" name="access_key" value="fb853de3-a479-4770-b2cd-deca1ae89eec">
     <div class="form rv">
       <div class="row"><div><label><span data-en>Name</span><span data-el>Όνομα</span></label><input name="name" type="text"></div><div><label>Email</label><input name="email" type="email"></div></div>
       <div class="ff"><label><span data-en>Phone</span><span data-el>Τηλέφωνο</span></label><input name="phone" type="tel"></div>
       <div class="ff"><label><span data-en>How can we help?</span><span data-el>Πώς μπορούμε να βοηθήσουμε;</span></label><textarea name="message" rows="4"></textarea></div>
-      <button type="button" class="btn pri" id="send"><span data-en>Send message</span><span data-el>Αποστολή μηνύματος</span></button>
+      <button type="submit" class="btn pri" id="send"><span data-en>Send message</span><span data-el>Αποστολή μηνύματος</span></button>
     </div>
+</form>
   </div>
 </section>
 </main>
@@ -646,20 +649,20 @@ html[lang="el"] [data-el]{display:revert}
   }
   runReveal();
 
-  // contact -> mailto
-  var send=document.getElementById('send');
-  if(send){send.addEventListener('click',function(){
-    var g=function(n){var el=document.querySelector('[name='+n+']');return el?el.value:'';};
-    var name=g('name'), email=g('email'), phone=g('phone'), message=g('message');
-    if(!name||!email){alert('Please fill in Name and Email');return;}
-    var body=encodeURIComponent('Name: '+name+'\nEmail: '+email+'\nPhone: '+phone+'\n\n'+message);
-    var subj=encodeURIComponent('New enquiry — 99 properties');
-    // Открывает почтовый клиент с уже заполненным письмом на Asadafar434@gmail.com
-    window.location.href='mailto:Asadafar434@gmail.com?subject='+subj+'&body='+body;
-    // Подсказка пользователю
-    setTimeout(function(){send.innerHTML='<span data-en>Opening your mail app…</span><span data-el>Άνοιγμα εφαρμογής αλληλογραφίας…</span>';},100);
-  });}
-})();
+  // Web3Forms submission handled natively via <form> tag
+  var formEl=document.querySelector('form[action*="web3forms"]');
+  if(formEl){formEl.addEventListener("submit",function(){var btn=document.getElementById("send");if(btn){setTimeout(function(){btn.textContent="Sent! We'll be in touch.";},200);}});}
+
+
+
+
+
+
+
+
+
+
+
 </script>
 </body>
 </html>
