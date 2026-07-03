@@ -669,7 +669,7 @@ html[lang="el"] [data-el]{display:revert}
 </script>
 <script src="gallery-data.js"></script>
 <script>
-(function(){var gc=document.getElementById("gallery-container");if(!gc||!window.GALLERY)return;window.GALLERY.forEach(function(p){var a=document.createElement("a");a.className="gphoto rv"+(p.big?" big":"");a.href="#contact";a.dataset.go="site";var img=document.createElement("img");img.src=p.src;img.alt=p.alt||"";img.loading="lazy";a.appendChild(img);gc.appendChild(a);});if(typeof runReveal==="function")runReveal();})();
+(function(){var gc=document.getElementById("gallery-container");if(!gc||!window.GALLERY)return;window.GALLERY.forEach(function(p){var a=document.createElement("a");a.className="gphoto"+(p.big?" big":"");a.href="#contact";a.dataset.go="site";var img=document.createElement("img");img.src=p.src;img.alt=p.alt||"";img.loading="lazy";a.appendChild(img);gc.appendChild(a);});})();
 </script>
 </body>
 </html>
