@@ -655,7 +655,6 @@ html[lang="el"] [data-el]{display:revert}
   // Web3Forms submission handled natively via <form> tag
   var formEl=document.querySelector('form[action*="web3forms"]');
   if(formEl){formEl.addEventListener("submit",function(){var btn=document.getElementById("send");if(btn){setTimeout(function(){btn.textContent="Sent! We'll be in touch.";},200);}});}
-  (function(){var gc=document.getElementById("gallery-container");if(!gc||!window.GALLERY)return;window.GALLERY.forEach(function(p,i){var a=document.createElement("a");a.className="gphoto rv"+(p.big?" big":"");a.href="#contact";a.dataset.go="site";var img=document.createElement("img");img.src=p.src;img.alt=p.alt||"";img.loading="lazy";a.appendChild(img);gc.appendChild(a);});runReveal();})();
 })();
 
 
@@ -669,5 +668,8 @@ html[lang="el"] [data-el]{display:revert}
 
 </script>
 <script src="gallery-data.js"></script>
+<script>
+(function(){var gc=document.getElementById("gallery-container");if(!gc||!window.GALLERY)return;window.GALLERY.forEach(function(p){var a=document.createElement("a");a.className="gphoto rv"+(p.big?" big":"");a.href="#contact";a.dataset.go="site";var img=document.createElement("img");img.src=p.src;img.alt=p.alt||"";img.loading="lazy";a.appendChild(img);gc.appendChild(a);});if(typeof runReveal==="function")runReveal();})();
+</script>
 </body>
 </html>
