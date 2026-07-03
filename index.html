@@ -113,8 +113,13 @@ h3{font-size:clamp(1.15rem,2vw,1.4rem)}
 .gphoto{display:block;overflow:hidden;border-radius:var(--r);background:var(--sky-200);position:relative;cursor:pointer}
 .gphoto img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
 .gphoto:hover img{transform:scale(1.06)}
-.gphoto::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(11,44,99,.35));opacity:0;transition:.3s}
+.gphoto::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(11,44,99,.7));opacity:0;transition:.3s}
 .gphoto:hover::after{opacity:1}
+.gphoto-info{position:absolute;bottom:0;left:0;right:0;padding:14px 16px;color:#fff;z-index:2;opacity:0;transition:.3s;pointer-events:none}
+.gphoto:hover .gphoto-info{opacity:1}
+.gphoto-info .gprice{font-size:.95rem;font-weight:700;display:block}
+.gphoto-info .glabel{font-size:.8rem;opacity:.85;display:block;margin-top:2px}
+.gphoto-info .gloc{font-size:.75rem;opacity:.7;display:block}
 .gphoto.big{grid-column:span 2;grid-row:span 2}
 .gphoto.wide{grid-column:span 2}
 @media(max-width:760px){
@@ -669,7 +674,7 @@ html[lang="el"] [data-el]{display:revert}
 </script>
 <script src="gallery-data.js"></script>
 <script>
-(function(){var gc=document.getElementById("gallery-container");if(!gc||!window.GALLERY)return;window.GALLERY.forEach(function(p){var a=document.createElement("a");a.className="gphoto"+(p.big?" big":"");a.href="#contact";a.dataset.go="site";var img=document.createElement("img");img.src=p.src;img.alt=p.alt||"";img.loading="lazy";a.appendChild(img);gc.appendChild(a);});})();
+(function(){var gc=document.getElementById("gallery-container");if(!gc||!window.GALLERY)return;window.GALLERY.forEach(function(p){var a=document.createElement("a");a.className="gphoto"+(p.big?" big":"");a.href="#contact";a.dataset.go="site";var img=document.createElement("img");img.src=p.src;img.alt=p.alt||"";img.loading="lazy";a.appendChild(img);if(p.price||p.label||p.location){var info=document.createElement("div");info.className="gphoto-info";info.innerHTML=(p.price?'<span class="gprice">'+p.price+'</span>':'')+(p.label?'<span class="glabel">'+p.label+'</span>':'')+(p.location?'<span class="gloc">📍 '+p.location+'</span>':'');a.appendChild(info);}gc.appendChild(a);});})();
 </script>
 </body>
 </html>
