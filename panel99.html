@@ -152,17 +152,22 @@ async function loadGallery() {
   showStatus('Загрузка галереи...', 'info');
   showProgress(20);
   try {
-    // Get SHA from metadata (works even for large files)
-    const meta = await ghGet('/repos/' + REPO + '/contents/' + FILE);
-    fileSha = meta.sha;
+    // Get SHA via git trees API (works for files of any size)
+    authStatus('Получаю список файлов...', 'info');
+    const tree = await ghGet('/repos/' + REPO + '/git/trees/main?recursive=1');
+    const fileEntry = tree.tree.find(function(f){ return f.path === FILE; });
+    if (!fileEntry) throw new Error('Файл ' + FILE + ' не найден в репозитории');
+    fileSha = fileEntry.sha;
     showProgress(50);
-    // Read actual content via raw URL (no 1MB limit)
+    authStatus('Загружаю фото (может занять 10-20 сек)...', 'info');
+    // Read content via raw URL (no 1MB limit)
     const rawUrl = 'https://raw.githubusercontent.com/' + REPO + '/main/' + FILE + '?t=' + Date.now();
     const rawResp = await fetch(rawUrl, { headers: { Authorization: 'Bearer ' + token } });
-    if (!rawResp.ok) throw new Error('Не удалось загрузить gallery-data.js (' + rawResp.status + ')');
+    if (!rawResp.ok) throw new Error('raw fetch: ' + rawResp.status);
     const code = await rawResp.text();
     const match = code.match(/window\.GALLERY\s*=\s*(\[[\s\S]*\]);/);
     if (!match) throw new Error('Не удалось прочитать структуру gallery-data.js');
+    authStatus('Парсинг данных...', 'info');
     gallery = JSON.parse(match[1]);
     showProgress(100);
     hideStatus();
@@ -171,7 +176,7 @@ async function loadGallery() {
     document.getElementById('user-label').textContent = '✓ подключено · ' + REPO;
     renderCards();
   } catch(e) {
-    showStatus('Ошибка: ' + e.message + ' · Проверь токен (нужен scope: repo)', 'err');
+    authStatus('Ошибка загрузки: ' + e.message, 'err');
     showProgress(0);
   }
 }
