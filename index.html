@@ -127,6 +127,23 @@ h3{font-size:clamp(1.15rem,2vw,1.4rem)}
   .gphoto.big{grid-column:span 2;grid-row:span 2}
   .gphoto.wide{grid-column:span 2}
 }
+/* ---- Property detail page ---- */
+#prop{background:#f8f9fc;min-height:100vh}
+.prop-hero{position:relative;height:55vh;min-height:320px;overflow:hidden;background:#06204c}
+.prop-hero img{width:100%;height:100%;object-fit:cover;display:block}
+.prop-back{position:absolute;top:20px;left:20px;z-index:10;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);color:#fff;border:1.5px solid rgba(255,255,255,.3);padding:9px 18px;border-radius:999px;font-weight:600;font-size:.88rem;cursor:pointer;text-decoration:none;transition:.2s}
+.prop-back:hover{background:rgba(255,255,255,.28)}
+.prop-badge-price{position:absolute;bottom:24px;right:24px;background:#fff;color:#06204c;font-weight:800;font-size:1.4rem;padding:12px 22px;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.18)}
+.prop-body{max-width:860px;margin:0 auto;padding:40px 20px 80px}
+.prop-title{font-size:1.9rem;font-weight:800;color:#06204c;margin-bottom:10px;line-height:1.2}
+.prop-loc{color:#6b7a99;font-size:1rem;margin-bottom:22px;display:flex;align-items:center;gap:6px}
+.prop-chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px}
+.prop-chip{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1.5px solid #dde3ef;border-radius:999px;padding:8px 16px;font-size:.88rem;font-weight:600;color:#1a2540}
+.prop-chip span{font-size:1.1rem}
+.prop-desc{font-size:1rem;line-height:1.75;color:#374151;background:#fff;border-radius:16px;padding:28px;margin-bottom:28px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+.prop-cta{display:inline-flex;align-items:center;gap:10px;background:#06204c;color:#fff;font-weight:700;font-size:1rem;padding:15px 32px;border-radius:12px;text-decoration:none;transition:.2s;border:none;cursor:pointer}
+.prop-cta:hover{background:#1763c6}
+@media(max-width:600px){.prop-hero{height:40vh}.prop-title{font-size:1.4rem}.prop-badge-price{font-size:1rem;padding:9px 16px;bottom:14px;right:14px}}
 
 /* services */
 .svcs{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
@@ -580,6 +597,24 @@ html[lang="el"] [data-el]{display:revert}
 </section>
 </main>
 
+<!-- ===== PROPERTY DETAIL PAGE ===== -->
+<main id="prop" hidden>
+  <div class="prop-hero">
+    <a class="prop-back" onclick="showView('site');history.back();return false;" href="#">&#8592; <span data-en>Back to properties</span><span data-el>Πίσω</span><span data-tr>Geri</span><span data-zh>返回</span></a>
+    <img id="prop-img" src="" alt="">
+    <div class="prop-badge-price" id="prop-price"></div>
+  </div>
+  <div class="prop-body">
+    <h1 class="prop-title" id="prop-title"></h1>
+    <div class="prop-loc" id="prop-loc"></div>
+    <div class="prop-chips" id="prop-chips"></div>
+    <div class="prop-desc" id="prop-desc"></div>
+    <a href="#contact" class="prop-cta" onclick="showView('site');setTimeout(function(){document.getElementById('contact').scrollIntoView({behavior:'smooth'});},80);return false;">
+      <span>✉</span> <span data-en>Enquire about this property</span><span data-el>Επικοινωνήστε μαζί μας</span><span data-tr>Bu mülk hakkında bilgi alın</span><span data-zh>咨询此房产</span>
+    </a>
+  </div>
+</main>
+
 <!-- ===== FOOTER ===== -->
 <footer class="footer">
   <div class="wrap">
@@ -611,27 +646,58 @@ html[lang="el"] [data-el]{display:revert}
 
 <script>
 (function(){
-  var site=document.getElementById('site'), gv=document.getElementById('gv');
+  var site=document.getElementById('site'), gv=document.getElementById('gv'), prop=document.getElementById('prop');
   var langWrap=document.getElementById('lang'), htmlEl=document.documentElement;
   var savedLang='en';
 
   function setLang(c){htmlEl.lang=c;langWrap.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.set===c)});}
   langWrap.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){savedLang=b.dataset.set;setLang(savedLang);});});
 
+  function showView(view){
+    site.hidden=view!=='site'; gv.hidden=view!=='gv'; prop.hidden=view!=='prop';
+    langWrap.style.display=view==='gv'?'none':'';
+    if(view==='gv')setLang('en'); else setLang(savedLang);
+    window.scrollTo(0,0);
+    if(view==='site'||view==='gv')runReveal();
+  }
+  window.showView=showView;
+
+  window.openProp=function(p){
+    document.getElementById('prop-img').src=p.src;
+    document.getElementById('prop-img').alt=p.label||p.alt||'';
+    document.getElementById('prop-price').textContent=p.price||'';
+    document.getElementById('prop-price').style.display=p.price?'':'none';
+    document.getElementById('prop-title').textContent=p.label||p.alt||'';
+    var loc=document.getElementById('prop-loc');
+    loc.innerHTML=p.location?'<span style="font-size:1.2rem">📍</span>'+p.location:'';
+    var chips=document.getElementById('prop-chips');
+    chips.innerHTML='';
+    if(p.beds){var c=document.createElement('div');c.className='prop-chip';c.innerHTML='<span>🛏</span>'+p.beds+' bed'+(p.beds>1?'s':'');chips.appendChild(c);}
+    if(p.baths){var c2=document.createElement('div');c2.className='prop-chip';c2.innerHTML='<span>🚿</span>'+p.baths+' bath'+(p.baths>1?'s':'');chips.appendChild(c2);}
+    if(p.sqm){var c3=document.createElement('div');c3.className='prop-chip';c3.innerHTML='<span>📐</span>'+p.sqm+' m²';chips.appendChild(c3);}
+    if(p.type){var c4=document.createElement('div');c4.className='prop-chip';c4.innerHTML='<span>🏠</span>'+p.type;chips.appendChild(c4);}
+    document.getElementById('prop-desc').textContent=p.description||'';
+    document.getElementById('prop-desc').style.display=p.description?'':'none';
+    showView('prop');
+    history.pushState({view:'prop',id:p.id},'',window.location.pathname+'#property-'+p.id);
+  };
+
+  window.addEventListener('popstate',function(e){
+    if(e.state&&e.state.view)showView(e.state.view);
+    else showView('site');
+  });
+
   function show(view){
-    if(view==='gv'){site.hidden=true;gv.hidden=false;langWrap.style.display='none';setLang('en');}
-    else{gv.hidden=true;site.hidden=false;langWrap.style.display='';setLang(savedLang);}
-    runReveal();
+    if(view==='gv'){showView('gv');}
+    else{showView('site');}
   }
   document.querySelectorAll('[data-go]').forEach(function(a){
     a.addEventListener('click',function(e){
       var go=a.dataset.go, hash=a.getAttribute('href');
-      if(go==='gv'){e.preventDefault();e.stopPropagation();show('gv');window.scrollTo(0,0);return false;}
-      // go to site
-      if(gv.hidden===false){ // currently on GV -> switch, then jump to anchor
+      if(go==='gv'){e.preventDefault();e.stopPropagation();show('gv');return false;}
+      if(gv.hidden===false||prop.hidden===false){
         show('site');
-        if(hash&&hash.indexOf('#')===0&&hash.length>1){e.preventDefault();var t=document.querySelector(hash);window.scrollTo(0,0);if(t)setTimeout(function(){t.scrollIntoView({behavior:'smooth'});},40);}
-        else{window.scrollTo(0,0);}
+        if(hash&&hash.indexOf('#')===0&&hash.length>1){e.preventDefault();var t=document.querySelector(hash);if(t)setTimeout(function(){t.scrollIntoView({behavior:'smooth'});},80);}
       }
     });
   });
@@ -674,7 +740,7 @@ html[lang="el"] [data-el]{display:revert}
 </script>
 <script src="gallery-data.js"></script>
 <script>
-(function(){var gc=document.getElementById("gallery-container");if(!gc||!window.GALLERY)return;window.GALLERY.forEach(function(p){var a=document.createElement("a");a.className="gphoto"+(p.big?" big":"");a.href="#contact";a.dataset.go="site";var img=document.createElement("img");img.src=p.src;img.alt=p.alt||"";img.loading="lazy";a.appendChild(img);if(p.price||p.label||p.location){var info=document.createElement("div");info.className="gphoto-info";info.innerHTML=(p.price?'<span class="gprice">'+p.price+'</span>':'')+(p.label?'<span class="glabel">'+p.label+'</span>':'')+(p.location?'<span class="gloc">📍 '+p.location+'</span>':'');a.appendChild(info);}gc.appendChild(a);});})();
+(function(){var gc=document.getElementById("gallery-container");if(!gc||!window.GALLERY)return;window.GALLERY.forEach(function(p){var a=document.createElement("a");a.className="gphoto"+(p.big?" big":"");a.href="#property-"+p.id;a.addEventListener("click",function(e){e.preventDefault();if(window.openProp)window.openProp(p);});var img=document.createElement("img");img.src=p.src;img.alt=p.label||p.alt||"";img.loading="lazy";a.appendChild(img);if(p.price||p.label||p.location){var info=document.createElement("div");info.className="gphoto-info";info.innerHTML=(p.price?'<span class="gprice">'+p.price+'</span>':'')+(p.label?'<span class="glabel">'+p.label+'</span>':'')+(p.location?'<span class="gloc">📍 '+p.location+'</span>':'');a.appendChild(info);}gc.appendChild(a);});})();
 </script>
 </body>
 </html>

@@ -197,9 +197,16 @@ function renderCards() {
       '<div class="card-drag">⠿⠿</div>' +
       '<img src="' + p.src + '" alt="' + (p.alt||'') + '">' +
       '<div class="card-body">' +
-        '<input placeholder="Название / описание" value="' + (p.label||'') + '" oninput="gallery['+i+'].label=this.value">' +
+        '<input placeholder="Название объекта" value="' + (p.label||'') + '" oninput="gallery['+i+'].label=this.value">' +
         '<input placeholder="Цена (напр. €450,000)" value="' + (p.price||'') + '" oninput="gallery['+i+'].price=this.value">' +
-        '<input placeholder="Локация (напр. Glyfada)" value="' + (p.location||'') + '" oninput="gallery['+i+'].location=this.value">' +
+        '<input placeholder="Локация (напр. Glyfada, Athens)" value="' + (p.location||'') + '" oninput="gallery['+i+'].location=this.value">' +
+        '<div style="display:flex;gap:6px">' +
+          '<input placeholder="🛏 Спален" value="' + (p.beds||'') + '" oninput="gallery['+i+'].beds=this.value" style="flex:1">' +
+          '<input placeholder="🚿 Ванных" value="' + (p.baths||'') + '" oninput="gallery['+i+'].baths=this.value" style="flex:1">' +
+          '<input placeholder="📐 м²" value="' + (p.sqm||'') + '" oninput="gallery['+i+'].sqm=this.value" style="flex:1">' +
+        '</div>' +
+        '<input placeholder="Тип (Villa, Apartment, House…)" value="' + (p.type||'') + '" oninput="gallery['+i+'].type=this.value">' +
+        '<textarea placeholder="Описание объекта…" oninput="gallery['+i+'].description=this.value" style="width:100%;border:1.5px solid #dde3ef;border-radius:8px;padding:8px 10px;font-size:.85rem;margin-bottom:8px;outline:none;resize:vertical;min-height:72px;font-family:inherit">' + (p.description||'') + '</textarea>' +
         '<div class="card-actions">' +
           '<button class="main-btn" onclick="toggleBig('+i+')">' + (p.big ? '★ Главная' : '☆ Сделать главной') + '</button>' +
           '<button class="del" onclick="deleteCard('+i+')">✕ Удалить</button>' +
