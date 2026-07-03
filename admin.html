@@ -114,12 +114,20 @@ const API  = 'https://api.github.com';
 let token = '', gallery = [], fileSha = '';
 
 // ---- AUTH ----
-function login() {
+async function login() {
   const t = document.getElementById('token-input').value.trim();
   if (!t) return alert('Введите токен');
   token = t;
-  localStorage.setItem('gh_token', t);
-  loadGallery();
+  showStatus('Проверка токена...', 'info');
+  try {
+    const user = await ghGet('/user');
+    showStatus('Токен OK, пользователь: ' + user.login + '. Загружаю галерею...', 'ok');
+    localStorage.setItem('gh_token', t);
+    loadGallery();
+  } catch(e) {
+    showStatus('Токен не принят: ' + e.message, 'err');
+    token = '';
+  }
 }
 
 function logout() {
