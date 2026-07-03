@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>99 properties — Admin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#f4f6fa;color:#1a2540;min-height:100vh}
+.topbar{background:#06204c;color:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
+.topbar h1{font-size:1.1rem;font-weight:700;letter-spacing:.02em}
+.topbar span{font-size:.8rem;opacity:.6}
+.wrap{max-width:1100px;margin:0 auto;padding:32px 20px}
+
+/* Auth */
+.auth-box{background:#fff;border-radius:16px;padding:40px;max-width:480px;margin:60px auto;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+.auth-box h2{font-size:1.3rem;margin-bottom:8px}
+.auth-box p{color:#6b7a99;font-size:.9rem;margin-bottom:24px}
+.auth-box input{width:100%;border:1.5px solid #dde3ef;border-radius:10px;padding:12px 14px;font-size:.95rem;margin-bottom:14px;outline:none;transition:.2s}
+.auth-box input:focus{border-color:#1763c6;box-shadow:0 0 0 3px rgba(23,99,198,.12)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:10px;border:none;cursor:pointer;font-weight:600;font-size:.9rem;transition:.2s}
+.btn-pri{background:#06204c;color:#fff}.btn-pri:hover{background:#1763c6}
+.btn-danger{background:#fff;color:#c0392b;border:1.5px solid #e8c4c4}.btn-danger:hover{background:#fdf0f0}
+.btn-ghost{background:#fff;color:#06204c;border:1.5px solid #dde3ef}.btn-ghost:hover{background:#f4f6fa}
+.btn-green{background:#1a7f5a;color:#fff}.btn-green:hover{background:#15a068}
+
+/* Toolbar */
+.toolbar{display:flex;gap:12px;align-items:center;margin-bottom:28px;flex-wrap:wrap}
+.toolbar h2{font-size:1.2rem;font-weight:700;flex:1}
+
+/* Upload zone */
+.upload-zone{border:2px dashed #c5d0e6;border-radius:16px;padding:40px;text-align:center;cursor:pointer;transition:.2s;background:#fff;margin-bottom:28px}
+.upload-zone:hover,.upload-zone.drag{border-color:#1763c6;background:#f0f5ff}
+.upload-zone p{color:#6b7a99;margin-top:8px;font-size:.9rem}
+.upload-zone .icon{font-size:2.5rem}
+#file-input{display:none}
+
+/* Cards grid */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+.card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);transition:.2s;position:relative}
+.card:hover{box-shadow:0 6px 24px rgba(0,0,0,.12)}
+.card.dragging{opacity:.4}
+.card.big-card::before{content:'★ Главная';position:absolute;top:10px;left:10px;background:#06204c;color:#fff;font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:999px;z-index:2}
+.card img{width:100%;height:180px;object-fit:cover;display:block}
+.card-body{padding:14px}
+.card-body input{width:100%;border:1.5px solid #dde3ef;border-radius:8px;padding:8px 10px;font-size:.85rem;margin-bottom:8px;outline:none}
+.card-body input:focus{border-color:#1763c6}
+.card-actions{display:flex;gap:8px;margin-top:4px}
+.card-actions button{flex:1;padding:7px;border-radius:8px;border:1.5px solid #dde3ef;background:#fff;cursor:pointer;font-size:.8rem;font-weight:600;transition:.2s}
+.card-actions .del{color:#c0392b;border-color:#e8c4c4}.card-actions .del:hover{background:#fdf0f0}
+.card-actions .main-btn{color:#06204c}.card-actions .main-btn:hover{background:#f4f6fa}
+.card-drag{color:#aab;cursor:grab;font-size:1.2rem;text-align:center;padding:6px 0 2px;user-select:none}
+
+/* Status */
+.status{padding:12px 18px;border-radius:10px;margin-bottom:20px;font-size:.9rem;font-weight:500;display:none}
+.status.ok{background:#d4edda;color:#155724;display:block}
+.status.err{background:#f8d7da;color:#721c24;display:block}
+.status.info{background:#d1ecf1;color:#0c5460;display:block}
+
+/* Progress */
+.progress{height:4px;background:#dde3ef;border-radius:2px;margin-bottom:20px;overflow:hidden;display:none}
+.progress-bar{height:100%;background:#1763c6;border-radius:2px;transition:width .3s}
+
+.token-hint{font-size:.78rem;color:#6b7a99;margin-top:6px}
+.token-hint a{color:#1763c6}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>99 properties · Admin Panel</h1>
+  <span id="user-label">не авторизован</span>
+</div>
+
+<!-- AUTH -->
+<div class="wrap" id="auth-section">
+  <div class="auth-box">
+    <h2>Войти</h2>
+    <p>Введите GitHub Personal Access Token для управления галереей.</p>
+    <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+    <p class="token-hint">Создать токен: <a href="https://github.com/settings/tokens/new?scopes=repo&description=99properties-admin" target="_blank">github.com/settings/tokens</a> → нужен scope <b>repo</b></p>
+    <br>
+    <button class="btn btn-pri" onclick="login()">Войти →</button>
+  </div>
+</div>
+
+<!-- MAIN PANEL -->
+<div class="wrap" id="main-section" style="display:none">
+  <div id="status" class="status"></div>
+  <div class="progress" id="progress"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+
+  <div class="toolbar">
+    <h2>Галерея недвижимости</h2>
+    <button class="btn btn-ghost" onclick="logout()">Выйти</button>
+    <button class="btn btn-green" onclick="publish()">🚀 Опубликовать на сайте</button>
+  </div>
+
+  <!-- Upload zone -->
+  <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+    <div class="icon">📸</div>
+    <b>Перетащите фото сюда или нажмите для выбора</b>
+    <p>JPG, PNG, WEBP · Первое фото — главная (большая карточка)</p>
+  </div>
+  <input type="file" id="file-input" multiple accept="image/*" onchange="handleFiles(this.files)">
+
+  <div class="cards" id="cards-grid"></div>
+</div>
+
+<script>
+const REPO = 'asadafar434-a11y/efimius-site';
+const FILE = 'gallery-data.js';
+const API  = 'https://api.github.com';
+
+let token = '', gallery = [], fileSha = '';
+
+// ---- AUTH ----
+function login() {
+  const t = document.getElementById('token-input').value.trim();
+  if (!t) return alert('Введите токен');
+  token = t;
+  localStorage.setItem('gh_token', t);
+  loadGallery();
+}
+
+function logout() {
+  localStorage.removeItem('gh_token');
+  token = ''; gallery = []; fileSha = '';
+  document.getElementById('auth-section').style.display = '';
+  document.getElementById('main-section').style.display = 'none';
+  document.getElementById('user-label').textContent = 'не авторизован';
+}
+
+// ---- LOAD ----
+async function loadGallery() {
+  showStatus('Загрузка галереи...', 'info');
+  showProgress(20);
+  try {
+    const r = await ghGet('/repos/' + REPO + '/contents/' + FILE);
+    fileSha = r.sha;
+    const code = atob(r.content.replace(/\n/g, ''));
+    const match = code.match(/window\.GALLERY\s*=\s*(\[[\s\S]*\]);/);
+    if (!match) throw new Error('Не удалось прочитать gallery-data.js');
+    gallery = JSON.parse(match[1]);
+    showProgress(100);
+    hideStatus();
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('main-section').style.display = '';
+    document.getElementById('user-label').textContent = '✓ подключено · ' + REPO;
+    renderCards();
+  } catch(e) {
+    showStatus('Ошибка: ' + e.message, 'err');
+    showProgress(0);
+  }
+}
+
+// ---- RENDER CARDS ----
+function renderCards() {
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = '';
+  gallery.forEach(function(p, i) {
+    const card = document.createElement('div');
+    card.className = 'card' + (p.big ? ' big-card' : '');
+    card.draggable = true;
+    card.dataset.idx = i;
+    card.addEventListener('dragstart', function(e){ e.dataTransfer.setData('idx', i); card.classList.add('dragging'); });
+    card.addEventListener('dragend', function(){ card.classList.remove('dragging'); });
+    card.addEventListener('dragover', function(e){ e.preventDefault(); });
+    card.addEventListener('drop', function(e){ e.preventDefault(); const from = +e.dataTransfer.getData('idx'); moveCard(from, i); });
+
+    card.innerHTML =
+      '<div class="card-drag">⠿⠿</div>' +
+      '<img src="' + p.src + '" alt="' + (p.alt||'') + '">' +
+      '<div class="card-body">' +
+        '<input placeholder="Название / описание" value="' + (p.label||'') + '" oninput="gallery['+i+'].label=this.value">' +
+        '<input placeholder="Цена (напр. €450,000)" value="' + (p.price||'') + '" oninput="gallery['+i+'].price=this.value">' +
+        '<input placeholder="Локация (напр. Glyfada)" value="' + (p.location||'') + '" oninput="gallery['+i+'].location=this.value">' +
+        '<div class="card-actions">' +
+          '<button class="main-btn" onclick="toggleBig('+i+')">' + (p.big ? '★ Главная' : '☆ Сделать главной') + '</button>' +
+          '<button class="del" onclick="deleteCard('+i+')">✕ Удалить</button>' +
+        '</div>' +
+      '</div>';
+    grid.appendChild(card);
+  });
+}
+
+function moveCard(from, to) {
+  if (from === to) return;
+  const item = gallery.splice(from, 1)[0];
+  gallery.splice(to, 0, item);
+  renderCards();
+}
+
+function toggleBig(i) {
+  gallery.forEach(function(p){ p.big = false; });
+  gallery[i].big = true;
+  renderCards();
+}
+
+function deleteCard(i) {
+  if (!confirm('Удалить эту карточку?')) return;
+  gallery.splice(i, 1);
+  renderCards();
+}
+
+// ---- UPLOAD ----
+function handleDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag'); }
+function handleDragLeave() { document.getElementById('upload-zone').classList.remove('drag'); }
+function handleDrop(e) { e.preventDefault(); handleDragLeave(); handleFiles(e.dataTransfer.files); }
+
+function handleFiles(files) {
+  Array.from(files).forEach(function(file) {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      gallery.push({ id: Date.now(), big: gallery.length === 0, alt: file.name.replace(/\.[^.]+$/, ''), label: '', price: '', location: '', src: e.target.result });
+      renderCards();
+      showStatus('Фото добавлено. Нажмите "Опубликовать на сайте" для сохранения.', 'ok');
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ---- PUBLISH ----
+async function publish() {
+  showStatus('Публикация...', 'info');
+  showProgress(30);
+  try {
+    const jsContent = 'window.GALLERY = ' + JSON.stringify(gallery, null, 2) + ';\n';
+    const encoded = btoa(unescape(encodeURIComponent(jsContent)));
+    showProgress(60);
+    await ghPut('/repos/' + REPO + '/contents/' + FILE, {
+      message: 'Update gallery via admin panel',
+      content: encoded,
+      sha: fileSha
+    });
+    showProgress(100);
+    // Refresh SHA
+    const r2 = await ghGet('/repos/' + REPO + '/contents/' + FILE);
+    fileSha = r2.sha;
+    showStatus('✅ Опубликовано! Сайт обновится через 1-2 минуты.', 'ok');
+  } catch(e) {
+    showStatus('Ошибка публикации: ' + e.message, 'err');
+  }
+}
+
+// ---- GITHUB API ----
+async function ghGet(path) {
+  const r = await fetch(API + path, { headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' } });
+  if (!r.ok) throw new Error(r.status + ' ' + (await r.text()));
+  return r.json();
+}
+
+async function ghPut(path, body) {
+  const r = await fetch(API + path, { method: 'PUT', headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(r.status + ' ' + (await r.text()));
+  return r.json();
+}
+
+// ---- UI HELPERS ----
+function showStatus(msg, type) {
+  const el = document.getElementById('status');
+  el.textContent = msg; el.className = 'status ' + type;
+}
+function hideStatus() { document.getElementById('status').className = 'status'; }
+function showProgress(pct) {
+  const p = document.getElementById('progress');
+  const b = document.getElementById('progress-bar');
+  p.style.display = pct > 0 ? '' : 'none';
+  b.style.width = pct + '%';
+  if (pct >= 100) setTimeout(function(){ p.style.display = 'none'; }, 1000);
+}
+
+// Auto-login if token saved
+window.onload = function() {
+  const saved = localStorage.getItem('gh_token');
+  if (saved) { token = saved; document.getElementById('token-input').value = saved; loadGallery(); }
+};
+</script>
+</body>
+</html>
