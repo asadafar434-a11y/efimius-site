@@ -79,6 +79,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f4f6fa;color:#1a2540;m
     <p>Введите GitHub Personal Access Token для управления галереей.</p>
     <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
     <p class="token-hint">Создать токен: <a href="https://github.com/settings/tokens/new?scopes=repo&description=99properties-admin" target="_blank">github.com/settings/tokens</a> → нужен scope <b>repo</b></p>
+    <div id="auth-status" style="margin-top:14px;padding:10px 14px;border-radius:8px;font-size:.88rem;display:none"></div>
     <br>
     <button class="btn btn-pri" onclick="login()">Войти →</button>
   </div>
@@ -116,18 +117,26 @@ let token = '', gallery = [], fileSha = '';
 // ---- AUTH ----
 async function login() {
   const t = document.getElementById('token-input').value.trim();
-  if (!t) return alert('Введите токен');
+  if (!t) { authStatus('Введите токен', 'err'); return; }
   token = t;
-  showStatus('Проверка токена...', 'info');
+  authStatus('Проверка токена...', 'info');
   try {
     const user = await ghGet('/user');
-    showStatus('Токен OK, пользователь: ' + user.login + '. Загружаю галерею...', 'ok');
+    authStatus('OK: ' + user.login + ' — загружаю галерею...', 'ok');
     localStorage.setItem('gh_token', t);
     loadGallery();
   } catch(e) {
-    showStatus('Токен не принят: ' + e.message, 'err');
+    authStatus('Ошибка: ' + e.message, 'err');
     token = '';
   }
+}
+
+function authStatus(msg, type) {
+  const el = document.getElementById('auth-status');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type === 'err' ? '#f8d7da' : type === 'ok' ? '#d4edda' : '#d1ecf1';
+  el.style.color = type === 'err' ? '#721c24' : type === 'ok' ? '#155724' : '#0c5460';
 }
 
 function logout() {
@@ -286,8 +295,7 @@ function showProgress(pct) {
 
 // Auto-login if token saved
 window.onload = function() {
-  const saved = localStorage.getItem('gh_token');
-  if (saved) { token = saved; document.getElementById('token-input').value = saved; loadGallery(); }
+  localStorage.removeItem('gh_token'); // clear old tokens
 };
 </script>
 </body>
