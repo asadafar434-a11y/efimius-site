@@ -135,11 +135,17 @@ async function loadGallery() {
   showStatus('Загрузка галереи...', 'info');
   showProgress(20);
   try {
-    const r = await ghGet('/repos/' + REPO + '/contents/' + FILE);
-    fileSha = r.sha;
-    const code = atob(r.content.replace(/\n/g, ''));
+    // Get SHA from metadata (works even for large files)
+    const meta = await ghGet('/repos/' + REPO + '/contents/' + FILE);
+    fileSha = meta.sha;
+    showProgress(50);
+    // Read actual content via raw URL (no 1MB limit)
+    const rawUrl = 'https://raw.githubusercontent.com/' + REPO + '/main/' + FILE + '?t=' + Date.now();
+    const rawResp = await fetch(rawUrl, { headers: { Authorization: 'Bearer ' + token } });
+    if (!rawResp.ok) throw new Error('Не удалось загрузить gallery-data.js (' + rawResp.status + ')');
+    const code = await rawResp.text();
     const match = code.match(/window\.GALLERY\s*=\s*(\[[\s\S]*\]);/);
-    if (!match) throw new Error('Не удалось прочитать gallery-data.js');
+    if (!match) throw new Error('Не удалось прочитать структуру gallery-data.js');
     gallery = JSON.parse(match[1]);
     showProgress(100);
     hideStatus();
@@ -148,7 +154,7 @@ async function loadGallery() {
     document.getElementById('user-label').textContent = '✓ подключено · ' + REPO;
     renderCards();
   } catch(e) {
-    showStatus('Ошибка: ' + e.message, 'err');
+    showStatus('Ошибка: ' + e.message + ' · Проверь токен (нужен scope: repo)', 'err');
     showProgress(0);
   }
 }
