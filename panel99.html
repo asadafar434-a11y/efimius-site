@@ -159,12 +159,10 @@ async function loadGallery() {
     if (!fileEntry) throw new Error('Файл ' + FILE + ' не найден в репозитории');
     fileSha = fileEntry.sha;
     showProgress(50);
-    authStatus('Загружаю фото (может занять 10-20 сек)...', 'info');
-    // Read content via raw URL (no 1MB limit)
-    const rawUrl = 'https://raw.githubusercontent.com/' + REPO + '/main/' + FILE + '?t=' + Date.now();
-    const rawResp = await fetch(rawUrl, { headers: { Authorization: 'Bearer ' + token } });
-    if (!rawResp.ok) throw new Error('raw fetch: ' + rawResp.status);
-    const code = await rawResp.text();
+    authStatus('Загружаю данные галереи (10-30 сек)...', 'info');
+    // Read via git blobs API — works for files of any size, no CORS issues
+    const blob = await ghGet('/repos/' + REPO + '/git/blobs/' + fileSha);
+    const code = decodeURIComponent(escape(atob(blob.content.replace(/\n/g,''))));
     const match = code.match(/window\.GALLERY\s*=\s*(\[[\s\S]*\]);/);
     if (!match) throw new Error('Не удалось прочитать структуру gallery-data.js');
     authStatus('Парсинг данных...', 'info');
