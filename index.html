@@ -128,22 +128,53 @@ h3{font-size:clamp(1.15rem,2vw,1.4rem)}
   .gphoto.wide{grid-column:span 2}
 }
 /* ---- Property detail page ---- */
-#prop{background:#f8f9fc;min-height:100vh}
-.prop-hero{position:relative;height:55vh;min-height:320px;overflow:hidden;background:#06204c}
-.prop-hero img{width:100%;height:100%;object-fit:cover;display:block}
-.prop-back{position:absolute;top:20px;left:20px;z-index:10;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);color:#fff;border:1.5px solid rgba(255,255,255,.3);padding:9px 18px;border-radius:999px;font-weight:600;font-size:.88rem;cursor:pointer;text-decoration:none;transition:.2s}
-.prop-back:hover{background:rgba(255,255,255,.28)}
-.prop-badge-price{position:absolute;bottom:24px;right:24px;background:#fff;color:#06204c;font-weight:800;font-size:1.4rem;padding:12px 22px;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.18)}
-.prop-body{max-width:860px;margin:0 auto;padding:40px 20px 80px}
-.prop-title{font-size:1.9rem;font-weight:800;color:#06204c;margin-bottom:10px;line-height:1.2}
-.prop-loc{color:#6b7a99;font-size:1rem;margin-bottom:22px;display:flex;align-items:center;gap:6px}
-.prop-chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px}
-.prop-chip{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1.5px solid #dde3ef;border-radius:999px;padding:8px 16px;font-size:.88rem;font-weight:600;color:#1a2540}
-.prop-chip span{font-size:1.1rem}
-.prop-desc{font-size:1rem;line-height:1.75;color:#374151;background:#fff;border-radius:16px;padding:28px;margin-bottom:28px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
-.prop-cta{display:inline-flex;align-items:center;gap:10px;background:#06204c;color:#fff;font-weight:700;font-size:1rem;padding:15px 32px;border-radius:12px;text-decoration:none;transition:.2s;border:none;cursor:pointer}
-.prop-cta:hover{background:#1763c6}
-@media(max-width:600px){.prop-hero{height:40vh}.prop-title{font-size:1.4rem}.prop-badge-price{font-size:1rem;padding:9px 16px;bottom:14px;right:14px}}
+#prop{background:#fff;min-height:100vh}
+.prop-topbar{position:absolute;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:22px 32px}
+.prop-back{display:inline-flex;align-items:center;gap:9px;background:rgba(0,0,0,.32);backdrop-filter:blur(10px);color:#fff;border:1px solid rgba(255,255,255,.2);padding:10px 20px;border-radius:999px;font-weight:600;font-size:.85rem;cursor:pointer;text-decoration:none;transition:.2s;letter-spacing:.01em}
+.prop-back:hover{background:rgba(0,0,0,.5)}
+.prop-back svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.prop-hero{position:relative;height:80vh;min-height:480px;overflow:hidden;background:#06204c}
+.prop-hero img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 8s ease}
+#prop:not([hidden]) .prop-hero img{transform:scale(1.04)}
+.prop-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(5,18,45,.82) 0%,rgba(5,18,45,.2) 45%,transparent 70%)}
+.prop-hero-bottom{position:absolute;bottom:0;left:0;right:0;padding:40px 48px 36px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px}
+.prop-hero-left{}
+.prop-eyebrow{color:rgba(255,255,255,.6);font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.prop-title{font-size:2.4rem;font-weight:800;color:#fff;line-height:1.15;margin-bottom:10px;text-shadow:0 2px 20px rgba(0,0,0,.3)}
+.prop-loc{color:rgba(255,255,255,.78);font-size:.95rem;display:flex;align-items:center;gap:7px}
+.prop-loc-icon{width:14px;height:14px;opacity:.7;flex-shrink:0}
+.prop-price-hero{background:linear-gradient(135deg,#c9a84c,#e8cc6f);color:#06204c;font-weight:900;font-size:1.7rem;padding:14px 26px;border-radius:14px;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.25);letter-spacing:-.01em;flex-shrink:0}
+.prop-stats-bar{background:#06204c;display:flex;align-items:stretch;gap:0}
+.prop-stat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 12px;border-right:1px solid rgba(255,255,255,.1);color:#fff;gap:4px}
+.prop-stat:last-child{border-right:none}
+.prop-stat-val{font-size:1.25rem;font-weight:800;letter-spacing:-.02em}
+.prop-stat-lbl{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.55}
+.prop-main{max-width:1120px;margin:0 auto;padding:52px 32px 100px;display:grid;grid-template-columns:1fr 340px;gap:48px;align-items:start}
+.prop-section-label{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#1763c6;margin-bottom:14px}
+.prop-description{font-size:1.05rem;line-height:1.85;color:#374151;white-space:pre-wrap;margin-bottom:48px}
+.prop-sidebar{position:sticky;top:24px}
+.prop-sidebar-card{background:#fff;border:1.5px solid #e8ecf5;border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.08)}
+.prop-sidebar-top{background:linear-gradient(135deg,#06204c,#0a3070);padding:28px 24px}
+.prop-sidebar-price{color:#fff;font-size:2rem;font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
+.prop-sidebar-type{color:rgba(255,255,255,.55);font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+.prop-sidebar-stats{padding:20px 24px;border-bottom:1.5px solid #e8ecf5;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.prop-sstat{display:flex;flex-direction:column;gap:3px}
+.prop-sstat-val{font-size:1.1rem;font-weight:800;color:#06204c}
+.prop-sstat-lbl{font-size:.72rem;font-weight:600;color:#9aa3b5;text-transform:uppercase;letter-spacing:.06em}
+.prop-sidebar-cta{padding:20px 24px;display:flex;flex-direction:column;gap:10px}
+.prop-cta-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:#06204c;color:#fff;font-weight:700;font-size:.95rem;padding:15px;border-radius:12px;text-decoration:none;transition:.2s;border:none;cursor:pointer;width:100%}
+.prop-cta-btn:hover{background:#1763c6}
+.prop-cta-btn.secondary{background:#fff;color:#06204c;border:1.5px solid #dde3ef}
+.prop-cta-btn.secondary:hover{background:#f4f7ff;border-color:#1763c6}
+@media(max-width:900px){
+  .prop-main{grid-template-columns:1fr;padding:32px 20px 60px}
+  .prop-sidebar{position:static}
+  .prop-hero-bottom{padding:24px 20px 22px;flex-direction:column;align-items:flex-start;gap:14px}
+  .prop-title{font-size:1.6rem}
+  .prop-price-hero{font-size:1.2rem;padding:10px 18px}
+  .prop-topbar{padding:16px 20px}
+}
+@media(max-width:600px){.prop-hero{height:65vh;min-height:360px}.prop-stats-bar{flex-wrap:wrap}.prop-stat{min-width:50%}}
 
 /* services */
 .svcs{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
@@ -600,18 +631,53 @@ html[lang="el"] [data-el]{display:revert}
 <!-- ===== PROPERTY DETAIL PAGE ===== -->
 <main id="prop" hidden>
   <div class="prop-hero">
-    <a class="prop-back" onclick="showView('site');history.back();return false;" href="#">&#8592; <span data-en>Back to properties</span><span data-el>Πίσω</span><span data-tr>Geri</span><span data-zh>返回</span></a>
+    <div class="prop-topbar">
+      <a class="prop-back" onclick="showView('site');history.back();return false;" href="#">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        <span data-en>Back to listings</span><span data-el>Πίσω</span><span data-tr>Geri</span><span data-zh>返回</span>
+      </a>
+    </div>
     <img id="prop-img" src="" alt="">
-    <div class="prop-badge-price" id="prop-price"></div>
+    <div class="prop-hero-overlay"></div>
+    <div class="prop-hero-bottom">
+      <div class="prop-hero-left">
+        <div class="prop-eyebrow" id="prop-type-label"></div>
+        <h1 class="prop-title" id="prop-title"></h1>
+        <div class="prop-loc" id="prop-loc">
+          <svg class="prop-loc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          <span id="prop-loc-text"></span>
+        </div>
+      </div>
+      <div class="prop-price-hero" id="prop-price-hero"></div>
+    </div>
   </div>
-  <div class="prop-body">
-    <h1 class="prop-title" id="prop-title"></h1>
-    <div class="prop-loc" id="prop-loc"></div>
-    <div class="prop-chips" id="prop-chips"></div>
-    <div class="prop-desc" id="prop-desc"></div>
-    <a href="#contact" class="prop-cta" onclick="showView('site');setTimeout(function(){document.getElementById('contact').scrollIntoView({behavior:'smooth'});},80);return false;">
-      <span>✉</span> <span data-en>Enquire about this property</span><span data-el>Επικοινωνήστε μαζί μας</span><span data-tr>Bu mülk hakkında bilgi alın</span><span data-zh>咨询此房产</span>
-    </a>
+
+  <div class="prop-stats-bar" id="prop-stats-bar"></div>
+
+  <div class="prop-main">
+    <div class="prop-content">
+      <div id="prop-desc-wrap" style="display:none">
+        <div class="prop-section-label" data-en="About this property" data-el="Σχετικά με το ακίνητο" data-tr="Bu mülk hakkında" data-zh="关于此房产"></div>
+        <div class="prop-description" id="prop-desc"></div>
+      </div>
+    </div>
+    <div class="prop-sidebar">
+      <div class="prop-sidebar-card">
+        <div class="prop-sidebar-top">
+          <div class="prop-sidebar-price" id="prop-price-side"></div>
+          <div class="prop-sidebar-type" id="prop-type-side"></div>
+        </div>
+        <div class="prop-sidebar-stats" id="prop-sidebar-stats"></div>
+        <div class="prop-sidebar-cta">
+          <a href="#" class="prop-cta-btn" onclick="showView('site');setTimeout(function(){document.getElementById('contact').scrollIntoView({behavior:'smooth'});},80);return false;">
+            ✉ <span data-en>Enquire about this property</span><span data-el>Στείλτε μήνυμα</span><span data-tr>Bilgi Al</span><span data-zh>咨询此房产</span>
+          </a>
+          <a href="#" class="prop-cta-btn secondary" onclick="showView('site');return false;">
+            <span data-en>View all properties</span><span data-el>Όλα τα ακίνητα</span><span data-tr>Tüm Mülkler</span><span data-zh>查看所有房产</span>
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 </main>
 
@@ -665,19 +731,46 @@ html[lang="el"] [data-el]{display:revert}
   window.openProp=function(p){
     document.getElementById('prop-img').src=p.src;
     document.getElementById('prop-img').alt=p.label||p.alt||'';
-    document.getElementById('prop-price').textContent=p.price||'';
-    document.getElementById('prop-price').style.display=p.price?'':'none';
     document.getElementById('prop-title').textContent=p.label||p.alt||'';
-    var loc=document.getElementById('prop-loc');
-    loc.innerHTML=p.location?'<span style="font-size:1.2rem">📍</span>'+p.location:'';
-    var chips=document.getElementById('prop-chips');
-    chips.innerHTML='';
-    if(p.beds){var c=document.createElement('div');c.className='prop-chip';c.innerHTML='<span>🛏</span>'+p.beds+' bed'+(p.beds>1?'s':'');chips.appendChild(c);}
-    if(p.baths){var c2=document.createElement('div');c2.className='prop-chip';c2.innerHTML='<span>🚿</span>'+p.baths+' bath'+(p.baths>1?'s':'');chips.appendChild(c2);}
-    if(p.sqm){var c3=document.createElement('div');c3.className='prop-chip';c3.innerHTML='<span>📐</span>'+p.sqm+' m²';chips.appendChild(c3);}
-    if(p.type){var c4=document.createElement('div');c4.className='prop-chip';c4.innerHTML='<span>🏠</span>'+p.type;chips.appendChild(c4);}
+    // location
+    document.getElementById('prop-loc-text').textContent=p.location||'';
+    document.getElementById('prop-loc').style.display=p.location?'flex':'none';
+    // price
+    document.getElementById('prop-price-hero').textContent=p.price||'';
+    document.getElementById('prop-price-hero').style.display=p.price?'':'none';
+    document.getElementById('prop-price-side').textContent=p.price||'—';
+    // type label above title
+    var tl=document.getElementById('prop-type-label');
+    tl.textContent=p.type||'Property';
+    document.getElementById('prop-type-side').textContent=(p.type||'')+(p.location?' · '+p.location:'');
+    // stats bar
+    var sb=document.getElementById('prop-stats-bar');
+    sb.innerHTML='';
+    var stats=[];
+    if(p.beds)stats.push({val:p.beds,lbl:'Bedrooms'});
+    if(p.baths)stats.push({val:p.baths,lbl:'Bathrooms'});
+    if(p.sqm)stats.push({val:p.sqm+' m²',lbl:'Living area'});
+    if(p.type)stats.push({val:p.type,lbl:'Property type'});
+    if(p.location)stats.push({val:p.location,lbl:'Location'});
+    stats.forEach(function(s){var d=document.createElement('div');d.className='prop-stat';d.innerHTML='<span class="prop-stat-val">'+s.val+'</span><span class="prop-stat-lbl">'+s.lbl+'</span>';sb.appendChild(d);});
+    sb.style.display=stats.length?'flex':'none';
+    // sidebar stats
+    var ss=document.getElementById('prop-sidebar-stats');
+    ss.innerHTML='';
+    var sideStats=[];
+    if(p.beds)sideStats.push({val:p.beds,lbl:'Bedrooms'});
+    if(p.baths)sideStats.push({val:p.baths,lbl:'Bathrooms'});
+    if(p.sqm)sideStats.push({val:p.sqm+' m²',lbl:'Living area'});
+    if(p.type)sideStats.push({val:p.type,lbl:'Type'});
+    sideStats.forEach(function(s){var d=document.createElement('div');d.className='prop-sstat';d.innerHTML='<span class="prop-sstat-val">'+s.val+'</span><span class="prop-sstat-lbl">'+s.lbl+'</span>';ss.appendChild(d);});
+    ss.style.display=sideStats.length?'grid':'none';
+    // description
+    var dw=document.getElementById('prop-desc-wrap');
+    var dl=dw.querySelector('.prop-section-label');
+    var lang=document.documentElement.lang||'en';
+    dl.textContent=dl.getAttribute('data-'+(lang==='el'?'el':lang==='tr'?'tr':lang==='zh'?'zh':'en'))||'About this property';
     document.getElementById('prop-desc').textContent=p.description||'';
-    document.getElementById('prop-desc').style.display=p.description?'':'none';
+    dw.style.display=p.description?'':'none';
     showView('prop');
     history.pushState({view:'prop',id:p.id},'',window.location.pathname+'#property-'+p.id);
   };
