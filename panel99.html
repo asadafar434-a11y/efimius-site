@@ -36,20 +36,27 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f4f6fa;color:#1a2540;m
 #file-input{display:none}
 
 /* Cards grid */
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
-.card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);transition:.2s;position:relative}
-.card:hover{box-shadow:0 6px 24px rgba(0,0,0,.12)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px}
+.card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.08);transition:.2s;position:relative;border:1.5px solid #eef1f8}
+.card:hover{box-shadow:0 8px 32px rgba(0,0,0,.12);transform:translateY(-2px)}
 .card.dragging{opacity:.4}
-.card.big-card::before{content:'★ Главная';position:absolute;top:10px;left:10px;background:#06204c;color:#fff;font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:999px;z-index:2}
-.card img{width:100%;height:180px;object-fit:cover;display:block}
-.card-body{padding:14px}
-.card-body input{width:100%;border:1.5px solid #dde3ef;border-radius:8px;padding:8px 10px;font-size:.85rem;margin-bottom:8px;outline:none}
-.card-body input:focus{border-color:#1763c6}
-.card-actions{display:flex;gap:8px;margin-top:4px}
-.card-actions button{flex:1;padding:7px;border-radius:8px;border:1.5px solid #dde3ef;background:#fff;cursor:pointer;font-size:.8rem;font-weight:600;transition:.2s}
-.card-actions .del{color:#c0392b;border-color:#e8c4c4}.card-actions .del:hover{background:#fdf0f0}
-.card-actions .main-btn{color:#06204c}.card-actions .main-btn:hover{background:#f4f6fa}
-.card-drag{color:#aab;cursor:grab;font-size:1.2rem;text-align:center;padding:6px 0 2px;user-select:none}
+.card.big-card{border-color:#1763c6;border-width:2px}
+.card.big-card::before{content:'★ Главная карточка';position:absolute;top:12px;left:12px;background:#06204c;color:#fff;font-size:.7rem;font-weight:700;padding:5px 12px;border-radius:999px;z-index:2;letter-spacing:.04em}
+.card img{width:100%;height:200px;object-fit:cover;display:block}
+.card-drag{color:#c5cce0;cursor:grab;text-align:center;padding:8px 0 4px;user-select:none;font-size:1.1rem;background:#fafbfd;border-bottom:1px solid #eef1f8}
+.card-drag:active{cursor:grabbing}
+.card-body{padding:16px}
+.field-group{margin-bottom:14px}
+.field-label{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9aa3b5;margin-bottom:5px}
+.field-row{display:flex;gap:8px}
+.card-body input,.card-body textarea{width:100%;border:1.5px solid #e8ecf5;border-radius:8px;padding:9px 11px;font-size:.87rem;outline:none;transition:.2s;font-family:inherit;color:#1a2540;background:#fafbfd}
+.card-body input:focus,.card-body textarea:focus{border-color:#1763c6;background:#fff;box-shadow:0 0 0 3px rgba(23,99,198,.08)}
+.card-body textarea{resize:vertical;min-height:80px;line-height:1.5}
+.card-divider{height:1px;background:#eef1f8;margin:14px -16px}
+.card-actions{display:flex;gap:8px;margin-top:14px}
+.card-actions button{flex:1;padding:9px;border-radius:9px;border:1.5px solid #e8ecf5;background:#fff;cursor:pointer;font-size:.82rem;font-weight:700;transition:.2s;letter-spacing:.01em}
+.card-actions .del{color:#c0392b;border-color:#f0d0d0}.card-actions .del:hover{background:#fff5f5;border-color:#c0392b}
+.card-actions .main-btn{color:#06204c}.card-actions .main-btn:hover{background:#f0f4ff;border-color:#1763c6}
 
 /* Status */
 .status{padding:12px 18px;border-radius:10px;margin-bottom:20px;font-size:.9rem;font-weight:500;display:none}
@@ -162,7 +169,7 @@ async function loadGallery() {
     authStatus('Загружаю данные галереи (10-30 сек)...', 'info');
     // Read via git blobs API — works for files of any size, no CORS issues
     const blob = await ghGet('/repos/' + REPO + '/git/blobs/' + fileSha);
-    const code = atob(blob.content.replace(/\n/g,''));
+    const code = decodeURIComponent(escape(atob(blob.content.replace(/\n/g,''))));
     const match = code.match(/window\.GALLERY\s*=\s*(\[[\s\S]*\])/);
     if (!match) throw new Error('Не удалось прочитать структуру gallery-data.js');
     authStatus('Парсинг данных...', 'info');
@@ -193,22 +200,50 @@ function renderCards() {
     card.addEventListener('dragover', function(e){ e.preventDefault(); });
     card.addEventListener('drop', function(e){ e.preventDefault(); const from = +e.dataTransfer.getData('idx'); moveCard(from, i); });
 
+    var esc = function(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); };
     card.innerHTML =
-      '<div class="card-drag">⠿⠿</div>' +
-      '<img src="' + p.src + '" alt="' + (p.alt||'') + '">' +
+      '<div class="card-drag">⠿ Перетащите для сортировки</div>' +
+      '<img src="' + p.src + '" alt="">' +
       '<div class="card-body">' +
-        '<input placeholder="Название объекта" value="' + (p.label||'') + '" oninput="gallery['+i+'].label=this.value">' +
-        '<input placeholder="Цена (напр. €450,000)" value="' + (p.price||'') + '" oninput="gallery['+i+'].price=this.value">' +
-        '<input placeholder="Локация (напр. Glyfada, Athens)" value="' + (p.location||'') + '" oninput="gallery['+i+'].location=this.value">' +
-        '<div style="display:flex;gap:6px">' +
-          '<input placeholder="🛏 Спален" value="' + (p.beds||'') + '" oninput="gallery['+i+'].beds=this.value" style="flex:1">' +
-          '<input placeholder="🚿 Ванных" value="' + (p.baths||'') + '" oninput="gallery['+i+'].baths=this.value" style="flex:1">' +
-          '<input placeholder="📐 м²" value="' + (p.sqm||'') + '" oninput="gallery['+i+'].sqm=this.value" style="flex:1">' +
+        '<div class="field-group">' +
+          '<div class="field-label">Название объекта</div>' +
+          '<input placeholder="напр. Villa Glyfada" value="' + esc(p.label) + '" oninput="gallery['+i+'].label=this.value">' +
         '</div>' +
-        '<input placeholder="Тип (Villa, Apartment, House…)" value="' + (p.type||'') + '" oninput="gallery['+i+'].type=this.value">' +
-        '<textarea placeholder="Описание объекта…" oninput="gallery['+i+'].description=this.value" style="width:100%;border:1.5px solid #dde3ef;border-radius:8px;padding:8px 10px;font-size:.85rem;margin-bottom:8px;outline:none;resize:vertical;min-height:72px;font-family:inherit">' + (p.description||'') + '</textarea>' +
+        '<div class="field-row">' +
+          '<div class="field-group" style="flex:1">' +
+            '<div class="field-label">Цена</div>' +
+            '<input placeholder="€450,000" value="' + esc(p.price) + '" oninput="gallery['+i+'].price=this.value">' +
+          '</div>' +
+          '<div class="field-group" style="flex:1">' +
+            '<div class="field-label">Тип</div>' +
+            '<input placeholder="Villa / Apartment" value="' + esc(p.type) + '" oninput="gallery['+i+'].type=this.value">' +
+          '</div>' +
+        '</div>' +
+        '<div class="field-group">' +
+          '<div class="field-label">Локация</div>' +
+          '<input placeholder="Glyfada, Athens" value="' + esc(p.location) + '" oninput="gallery['+i+'].location=this.value">' +
+        '</div>' +
+        '<div class="field-row">' +
+          '<div class="field-group" style="flex:1">' +
+            '<div class="field-label">Спален</div>' +
+            '<input placeholder="3" value="' + esc(p.beds) + '" oninput="gallery['+i+'].beds=this.value">' +
+          '</div>' +
+          '<div class="field-group" style="flex:1">' +
+            '<div class="field-label">Ванных</div>' +
+            '<input placeholder="2" value="' + esc(p.baths) + '" oninput="gallery['+i+'].baths=this.value">' +
+          '</div>' +
+          '<div class="field-group" style="flex:1">' +
+            '<div class="field-label">Площадь м²</div>' +
+            '<input placeholder="120" value="' + esc(p.sqm) + '" oninput="gallery['+i+'].sqm=this.value">' +
+          '</div>' +
+        '</div>' +
+        '<div class="card-divider"></div>' +
+        '<div class="field-group">' +
+          '<div class="field-label">Об объекте — описание</div>' +
+          '<textarea placeholder="Расскажите об объекте: особенности, вид, ремонт, инфраструктура…" oninput="gallery['+i+'].description=this.value">' + esc(p.description) + '</textarea>' +
+        '</div>' +
         '<div class="card-actions">' +
-          '<button class="main-btn" onclick="toggleBig('+i+')">' + (p.big ? '★ Главная' : '☆ Сделать главной') + '</button>' +
+          '<button class="main-btn" onclick="toggleBig('+i+')">' + (p.big ? '★ Это главная' : '☆ Сделать главной') + '</button>' +
           '<button class="del" onclick="deleteCard('+i+')">✕ Удалить</button>' +
         '</div>' +
       '</div>';
