@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const wDir = 'C:/Users/evgenii/Downloads/gmail12_watermarked';
+const wDir = 'C:/Users/evgenii/Downloads/gmail12_resized';
 
 // Load watermarked photos as base64
 const files = fs.readdirSync(wDir).filter(f => f.endsWith('.jpg')).sort();
@@ -21,6 +21,11 @@ let gallery = (new Function('return ' + match[1]))();
 gallery = gallery.map(function(p) {
   if (!p.photos) p.photos = [p.src];
   return p;
+});
+
+// Remove any previous Lycabettus Studio entry (avoid duplicates on re-run)
+gallery = gallery.filter(function(p) {
+  return !(p.label === 'Lycabettus Studio' || p.alt === 'Lycabettus Studio');
 });
 
 // New Lycabettus studio property
