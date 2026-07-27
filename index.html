@@ -134,6 +134,15 @@ h3{font-size:clamp(1.15rem,2vw,1.4rem)}
 .prop-back:hover{background:rgba(0,0,0,.5)}
 .prop-back svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .prop-hero{position:relative;height:80vh;min-height:480px;overflow:hidden;background:#06204c}
+.prop-carousel{position:absolute;inset:0}
+.prop-carousel img{width:100%;height:100%;object-fit:cover;display:block}
+.carousel-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.38);border:none;color:#fff;font-size:2.4rem;line-height:1;width:48px;height:72px;cursor:pointer;z-index:12;transition:background .2s;border-radius:4px}
+.carousel-prev{left:16px}.carousel-next{right:16px}
+.carousel-btn:hover{background:rgba(0,0,0,.65)}
+.carousel-btn.hidden{display:none}
+.carousel-dots{position:absolute;bottom:96px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:12}
+.carousel-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.45);cursor:pointer;border:none;padding:0;transition:background .18s,transform .18s}
+.carousel-dot.active{background:#fff;transform:scale(1.25)}
 .prop-hero img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 8s ease}
 #prop:not([hidden]) .prop-hero img{transform:scale(1.04)}
 .prop-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(5,18,45,.82) 0%,rgba(5,18,45,.2) 45%,transparent 70%)}
@@ -151,7 +160,10 @@ h3{font-size:clamp(1.15rem,2vw,1.4rem)}
 .prop-stat-lbl{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.55}
 .prop-main{max-width:1120px;margin:0 auto;padding:52px 32px 100px;display:grid;grid-template-columns:1fr 340px;gap:48px;align-items:start}
 .prop-section-label{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#1763c6;margin-bottom:14px}
-.prop-description{font-size:1.05rem;line-height:1.85;color:#374151;white-space:pre-wrap;margin-bottom:48px}
+.prop-description{font-size:1.05rem;line-height:1.85;color:#374151;white-space:pre-wrap;margin-bottom:32px}
+.prop-features-list{list-style:none;padding:0;margin:0 0 48px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.prop-features-list li{display:flex;align-items:center;gap:10px;font-size:.97rem;color:#374151;padding:10px 14px;background:#f7f9fc;border-radius:8px;border-left:3px solid #1763c6}
+.prop-features-list li::before{content:"✓";color:#1763c6;font-weight:700;flex-shrink:0}
 .prop-sidebar{position:sticky;top:24px}
 .prop-sidebar-card{background:#fff;border:1.5px solid #e8ecf5;border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.08)}
 .prop-sidebar-top{background:linear-gradient(135deg,#06204c,#0a3070);padding:28px 24px}
@@ -637,7 +649,12 @@ html[lang="el"] [data-el]{display:revert}
         <span data-en>Back to listings</span><span data-el>Πίσω</span><span data-tr>Geri</span><span data-zh>返回</span>
       </a>
     </div>
-    <img id="prop-img" src="" alt="">
+    <div class="prop-carousel" id="prop-carousel">
+      <img id="prop-img" src="" alt="">
+      <button class="carousel-btn carousel-prev" id="carousel-prev" onclick="window.propCarouselStep(-1)">&#8249;</button>
+      <button class="carousel-btn carousel-next" id="carousel-next" onclick="window.propCarouselStep(1)">&#8250;</button>
+      <div class="carousel-dots" id="carousel-dots"></div>
+    </div>
     <div class="prop-hero-overlay"></div>
     <div class="prop-hero-bottom">
       <div class="prop-hero-left">
@@ -659,6 +676,10 @@ html[lang="el"] [data-el]{display:revert}
       <div id="prop-desc-wrap" style="display:none">
         <div class="prop-section-label" data-en="About this property" data-el="Σχετικά με το ακίνητο" data-tr="Bu mülk hakkında" data-zh="关于此房产"></div>
         <div class="prop-description" id="prop-desc"></div>
+      </div>
+      <div id="prop-features-wrap" style="display:none">
+        <div class="prop-section-label">Key features</div>
+        <ul class="prop-features-list" id="prop-features-list"></ul>
       </div>
     </div>
     <div class="prop-sidebar">
@@ -728,9 +749,37 @@ html[lang="el"] [data-el]{display:revert}
   }
   window.showView=showView;
 
+  // Carousel state
+  var _carPhotos=[], _carIdx=0;
+  function carGoTo(i){
+    _carIdx=i;
+    document.getElementById('prop-img').src=_carPhotos[i];
+    var dots=document.getElementById('carousel-dots').children;
+    for(var d=0;d<dots.length;d++)dots[d].classList.toggle('active',d===i);
+    document.getElementById('carousel-prev').classList.toggle('hidden',_carPhotos.length<=1);
+    document.getElementById('carousel-next').classList.toggle('hidden',_carPhotos.length<=1);
+  }
+  window.propCarouselStep=function(dir){
+    var n=(_carIdx+dir+_carPhotos.length)%_carPhotos.length;
+    carGoTo(n);
+  };
+
   window.openProp=function(p){
-    document.getElementById('prop-img').src=p.src;
+    // init carousel
+    _carPhotos=(p.photos&&p.photos.length)?p.photos:[p.src];
+    _carIdx=0;
+    var dotsEl=document.getElementById('carousel-dots');
+    dotsEl.innerHTML='';
+    _carPhotos.forEach(function(_,i){
+      var dot=document.createElement('button');
+      dot.className='carousel-dot'+(i===0?' active':'');
+      dot.onclick=(function(idx){return function(){carGoTo(idx);};})(i);
+      dotsEl.appendChild(dot);
+    });
+    document.getElementById('prop-img').src=_carPhotos[0];
     document.getElementById('prop-img').alt=p.label||p.alt||'';
+    document.getElementById('carousel-prev').classList.toggle('hidden',_carPhotos.length<=1);
+    document.getElementById('carousel-next').classList.toggle('hidden',_carPhotos.length<=1);
     document.getElementById('prop-title').textContent=p.label||p.alt||'';
     // location
     document.getElementById('prop-loc-text').textContent=p.location||'';
@@ -771,6 +820,14 @@ html[lang="el"] [data-el]{display:revert}
     dl.textContent=dl.getAttribute('data-'+(lang==='el'?'el':lang==='tr'?'tr':lang==='zh'?'zh':'en'))||'About this property';
     document.getElementById('prop-desc').textContent=p.description||'';
     dw.style.display=p.description?'':'none';
+    // features
+    var fw=document.getElementById('prop-features-wrap');
+    var fl=document.getElementById('prop-features-list');
+    fl.innerHTML='';
+    if(p.features&&p.features.length){
+      p.features.forEach(function(f){var li=document.createElement('li');li.textContent=f;fl.appendChild(li);});
+      fw.style.display='';
+    } else { fw.style.display='none'; }
     showView('prop');
     history.pushState({view:'prop',id:p.id},'',window.location.pathname+'#property-'+p.id);
   };

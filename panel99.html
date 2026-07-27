@@ -70,6 +70,20 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f4f6fa;color:#1a2540;m
 
 .token-hint{font-size:.78rem;color:#6b7a99;margin-top:6px}
 .token-hint a{color:#1763c6}
+
+/* Photo strip */
+.photo-strip{display:flex;gap:8px;padding:12px 16px 0;overflow-x:auto;align-items:flex-start;min-height:88px}
+.photo-strip::-webkit-scrollbar{height:4px}.photo-strip::-webkit-scrollbar-thumb{background:#c5d0e6;border-radius:2px}
+.thumb{position:relative;flex-shrink:0;width:72px;cursor:pointer;border-radius:8px;overflow:hidden;border:2px solid transparent;transition:.18s}
+.thumb:hover{border-color:#1763c6}
+.thumb.cover-photo{border-color:#c9a84c}
+.thumb img{width:72px;height:56px;object-fit:cover;display:block}
+.thumb-del{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;opacity:0;transition:.15s}
+.thumb:hover .thumb-del{opacity:1}
+.thumb-badge{position:absolute;bottom:0;left:0;right:0;background:rgba(201,168,76,.9);color:#fff;font-size:.55rem;font-weight:700;text-align:center;padding:2px 0;text-transform:uppercase;letter-spacing:.06em}
+.thumb-add{flex-shrink:0;width:72px;height:60px;border:2px dashed #c5d0e6;border-radius:8px;background:#fafbfd;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#9aa3b5;font-size:.7rem;font-weight:700;transition:.18s}
+.thumb-add:hover{border-color:#1763c6;color:#1763c6;background:#f0f5ff}
+.photo-count{font-size:.72rem;color:#9aa3b5;padding:4px 16px 8px;font-weight:600}
 </style>
 </head>
 <body>
@@ -200,10 +214,26 @@ function renderCards() {
     card.addEventListener('dragover', function(e){ e.preventDefault(); });
     card.addEventListener('drop', function(e){ e.preventDefault(); const from = +e.dataTransfer.getData('idx'); moveCard(from, i); });
 
+    // ensure photos array
+    if (!p.photos || !p.photos.length) p.photos = [p.src];
+    p.src = p.photos[0];
+
     var esc = function(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); };
+
+    // Build photo strip HTML (use data-idx on each thumb for remove)
+    var thumbsHtml = p.photos.map(function(ph, j){
+      return '<div class="thumb' + (j===0?' cover-photo':'') + '" onclick="setPhotoAsCover('+i+','+j+')" title="' + (j===0?'Обложка':'Нажмите чтобы сделать обложкой') + '">' +
+        '<img src="'+ph+'" alt="">' +
+        '<button class="thumb-del" onclick="event.stopPropagation();removePhoto('+i+','+j+')" title="Удалить фото">×</button>' +
+        (j===0?'<div class="thumb-badge">Обложка</div>':'') +
+        '</div>';
+    }).join('');
+    thumbsHtml += '<button class="thumb-add" onclick="addPhotosToCard('+i+')"><span style="font-size:1.4rem">+</span>Фото</button>';
+
     card.innerHTML =
       '<div class="card-drag">⠿ Перетащите для сортировки</div>' +
-      '<img src="' + p.src + '" alt="">' +
+      '<div class="photo-strip">' + thumbsHtml + '</div>' +
+      '<div class="photo-count">' + p.photos.length + ' фото</div>' +
       '<div class="card-body">' +
         '<div class="field-group">' +
           '<div class="field-label">Название объекта</div>' +
@@ -270,6 +300,53 @@ function deleteCard(i) {
   renderCards();
 }
 
+// ---- MULTI-PHOTO ----
+function setPhotoAsCover(cardIdx, photoIdx) {
+  if (photoIdx === 0) return;
+  var photos = gallery[cardIdx].photos;
+  var cover = photos.splice(photoIdx, 1)[0];
+  photos.unshift(cover);
+  gallery[cardIdx].src = cover;
+  renderCards();
+}
+
+function removePhoto(cardIdx, photoIdx) {
+  var photos = gallery[cardIdx].photos;
+  if (photos.length <= 1) { alert('Минимум 1 фото'); return; }
+  photos.splice(photoIdx, 1);
+  gallery[cardIdx].src = photos[0];
+  renderCards();
+}
+
+var _addTarget = -1;
+var _addInput = (function(){
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.multiple = true; inp.accept = 'image/*';
+  inp.style.display = 'none';
+  inp.onchange = function() {
+    var idx = _addTarget;
+    if (idx < 0) return;
+    Array.from(inp.files).forEach(function(file) {
+      if (!file.type.startsWith('image/')) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        if (!gallery[idx].photos) gallery[idx].photos = [gallery[idx].src];
+        gallery[idx].photos.push(e.target.result);
+        renderCards();
+      };
+      reader.readAsDataURL(file);
+    });
+    inp.value = '';
+  };
+  document.body.appendChild(inp);
+  return inp;
+})();
+
+function addPhotosToCard(cardIdx) {
+  _addTarget = cardIdx;
+  _addInput.click();
+}
+
 // ---- UPLOAD ----
 function handleDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag'); }
 function handleDragLeave() { document.getElementById('upload-zone').classList.remove('drag'); }
@@ -280,7 +357,8 @@ function handleFiles(files) {
     if (!file.type.startsWith('image/')) return;
     const reader = new FileReader();
     reader.onload = function(e) {
-      gallery.push({ id: Date.now(), big: gallery.length === 0, alt: file.name.replace(/\.[^.]+$/, ''), label: '', price: '', location: '', src: e.target.result });
+      var src = e.target.result;
+      gallery.push({ id: Date.now(), big: gallery.length === 0, alt: file.name.replace(/\.[^.]+$/, ''), label: '', price: '', location: '', src: src, photos: [src] });
       renderCards();
       showStatus('Фото добавлено. Нажмите "Опубликовать на сайте" для сохранения.', 'ok');
     };
