@@ -366,31 +366,58 @@ function handleFiles(files) {
   });
 }
 
-// ---- PUBLISH ----
+// ---- PUBLISH (Git Data API — no file-size limit) ----
 async function publish() {
   showStatus('Публикация...', 'info');
-  showProgress(20);
+  showProgress(10);
   try {
-    // Always get fresh SHA right before publishing
-    showStatus('Получаю актуальный SHA файла...', 'info');
-    const tree = await ghGet('/repos/' + REPO + '/git/trees/main?recursive=1');
-    const fileEntry = tree.tree.find(function(f){ return f.path === FILE; });
-    if (!fileEntry) throw new Error('Файл ' + FILE + ' не найден');
-    const freshSha = fileEntry.sha;
+    const jsContent = 'window.GALLERY = ' + JSON.stringify(gallery, null, 2) + ';\n';
+
+    // 1. Create blob (base64-encoded, any size)
+    showStatus('Создаю blob...', 'info');
+    const encoded = btoa(unescape(encodeURIComponent(jsContent)));
+    const blob = await ghPost('/repos/' + REPO + '/git/blobs', {
+      content: encoded,
+      encoding: 'base64'
+    });
+    showProgress(35);
+
+    // 2. Get latest commit SHA on main
+    showStatus('Получаю последний коммит...', 'info');
+    const ref = await ghGet('/repos/' + REPO + '/git/ref/heads/main');
+    const latestCommitSha = ref.object.sha;
     showProgress(50);
 
-    showStatus('Загружаю изменения...', 'info');
-    const jsContent = 'window.GALLERY = ' + JSON.stringify(gallery, null, 2) + ';\n';
-    const encoded = btoa(unescape(encodeURIComponent(jsContent)));
-    showProgress(70);
+    // 3. Get tree of latest commit
+    const latestCommit = await ghGet('/repos/' + REPO + '/git/commits/' + latestCommitSha);
+    const baseTreeSha = latestCommit.tree.sha;
+    showProgress(60);
 
-    await ghPut('/repos/' + REPO + '/contents/' + FILE, {
-      message: 'Update gallery via admin panel',
-      content: encoded,
-      sha: freshSha
+    // 4. Create new tree with updated file
+    showStatus('Создаю дерево...', 'info');
+    const newTree = await ghPost('/repos/' + REPO + '/git/trees', {
+      base_tree: baseTreeSha,
+      tree: [{ path: FILE, mode: '100644', type: 'blob', sha: blob.sha }]
     });
+    showProgress(75);
+
+    // 5. Create commit
+    showStatus('Создаю коммит...', 'info');
+    const newCommit = await ghPost('/repos/' + REPO + '/git/commits', {
+      message: 'Update gallery via admin panel',
+      tree: newTree.sha,
+      parents: [latestCommitSha]
+    });
+    showProgress(88);
+
+    // 6. Update branch ref
+    showStatus('Обновляю ветку...', 'info');
+    await ghPost('/repos/' + REPO + '/git/refs/heads/main', {
+      sha: newCommit.sha,
+      force: false
+    }, 'PATCH');
     showProgress(100);
-    fileSha = freshSha;
+
     showStatus('✅ Опубликовано! Сайт обновится через 1-2 минуты.', 'ok');
   } catch(e) {
     showStatus('Ошибка публикации: ' + e.message, 'err');
@@ -406,6 +433,12 @@ async function ghGet(path) {
 
 async function ghPut(path, body) {
   const r = await fetch(API + path, { method: 'PUT', headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(r.status + ' ' + (await r.text()));
+  return r.json();
+}
+
+async function ghPost(path, body, method) {
+  const r = await fetch(API + path, { method: method || 'POST', headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   if (!r.ok) throw new Error(r.status + ' ' + (await r.text()));
   return r.json();
 }
