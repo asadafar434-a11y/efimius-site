@@ -156,7 +156,8 @@ h3{font-size:clamp(1.15rem,2vw,1.4rem)}
 .prop-stats-bar{background:#06204c;display:flex;align-items:stretch;gap:0}
 .prop-stat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 12px;border-right:1px solid rgba(255,255,255,.1);color:#fff;gap:4px}
 .prop-stat:last-child{border-right:none}
-.prop-stat-icon{font-size:1.4rem;line-height:1;margin-bottom:2px}
+.prop-stat-icon{width:22px;height:22px;display:block;margin:0 auto 4px;opacity:.75}
+.prop-stat-icon svg{width:22px;height:22px;stroke:#fff}
 .prop-stat-val{font-size:1.25rem;font-weight:800;letter-spacing:-.02em}
 .prop-stat-lbl{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.55}
 .prop-main{max-width:1120px;margin:0 auto;padding:52px 32px 100px;display:grid;grid-template-columns:1fr 340px;gap:48px;align-items:start}
@@ -164,15 +165,19 @@ h3{font-size:clamp(1.15rem,2vw,1.4rem)}
 .prop-description{font-size:1.05rem;line-height:1.85;color:#374151;white-space:pre-wrap;margin-bottom:32px}
 .prop-features-list{list-style:none;padding:0;margin:0 0 48px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 .prop-features-list li{display:flex;align-items:center;gap:10px;font-size:.95rem;color:#374151;padding:11px 14px;background:#f7f9fc;border-radius:10px;border-left:3px solid #1763c6}
-.feat-icon{font-size:1.2rem;flex-shrink:0;line-height:1}
+.feat-icon{width:22px;height:22px;flex-shrink:0;color:#1763c6}
+.feat-icon svg{width:22px;height:22px;stroke:#1763c6}
 .prop-sidebar{position:sticky;top:24px}
 .prop-sidebar-card{background:#fff;border:1.5px solid #e8ecf5;border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.08)}
 .prop-sidebar-top{background:linear-gradient(135deg,#06204c,#0a3070);padding:28px 24px}
 .prop-sidebar-price{color:#fff;font-size:2rem;font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
 .prop-sidebar-type{color:rgba(255,255,255,.55);font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em}
 .prop-sidebar-stats{padding:20px 24px;border-bottom:1.5px solid #e8ecf5;display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.prop-sstat{display:flex;flex-direction:column;gap:3px}
-.prop-sstat-val{font-size:1.1rem;font-weight:800;color:#06204c}
+.prop-sstat{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #eef1f8}
+.prop-sstat:last-child{border-bottom:none}
+.prop-sstat-icon{width:20px;height:20px;flex-shrink:0;color:#1763c6}
+.prop-sstat-icon svg{width:20px;height:20px;stroke:#1763c6}
+.prop-sstat-val{font-size:1rem;font-weight:800;color:#06204c}
 .prop-sstat-lbl{font-size:.72rem;font-weight:600;color:#9aa3b5;text-transform:uppercase;letter-spacing:.06em}
 .prop-sidebar-cta{padding:20px 24px;display:flex;flex-direction:column;gap:10px}
 .prop-cta-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:#06204c;color:#fff;font-weight:700;font-size:.95rem;padding:15px;border-radius:12px;text-decoration:none;transition:.2s;border:none;cursor:pointer;width:100%}
@@ -797,22 +802,33 @@ html[lang="el"] [data-el]{display:revert}
     var sb=document.getElementById('prop-stats-bar');
     sb.innerHTML='';
     var stats=[];
-    if(p.beds)stats.push({val:p.beds,lbl:'Bedrooms',icon:'🛏'});
-    if(p.baths)stats.push({val:p.baths,lbl:'Bathrooms',icon:'🚿'});
-    if(p.sqm)stats.push({val:p.sqm+' m²',lbl:'Living area',icon:'📐'});
-    if(p.type)stats.push({val:p.type,lbl:'Property type',icon:'🏠'});
-    if(p.location)stats.push({val:p.location,lbl:'Location',icon:'📍'});
-    stats.forEach(function(s){var d=document.createElement('div');d.className='prop-stat';d.innerHTML=(s.icon?'<span class="prop-stat-icon">'+s.icon+'</span>':'')+'<span class="prop-stat-val">'+s.val+'</span><span class="prop-stat-lbl">'+s.lbl+'</span>';sb.appendChild(d);});
+    var SI={
+      bed:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M2 14h20"/><path d="M6 14v-4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4"/><rect x="4" y="20" width="4" height="2" rx="1"/><rect x="16" y="20" width="4" height="2" rx="1"/></svg>',
+      bath:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16a1 1 0 0 1 1 1v3a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4v-3a1 1 0 0 1 1-1z"/><path d="M6 12V5a2 2 0 0 1 2-2h3v2.25"/></svg>',
+      sqm:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>',
+      home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>',
+      pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>',
+      shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+      laptop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M0 20h24"/></svg>',
+      map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>',
+      check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+    };
+    if(p.beds)stats.push({val:p.beds,lbl:'Bedrooms',icon:SI.bed});
+    if(p.baths)stats.push({val:p.baths,lbl:'Bathrooms',icon:SI.bath});
+    if(p.sqm)stats.push({val:p.sqm+' m²',lbl:'Living area',icon:SI.sqm});
+    if(p.type)stats.push({val:p.type,lbl:'Property type',icon:SI.home});
+    if(p.location)stats.push({val:p.location,lbl:'Location',icon:SI.pin});
+    stats.forEach(function(s){var d=document.createElement('div');d.className='prop-stat';d.innerHTML='<span class="prop-stat-icon">'+s.icon+'</span><span class="prop-stat-val">'+s.val+'</span><span class="prop-stat-lbl">'+s.lbl+'</span>';sb.appendChild(d);});
     sb.style.display=stats.length?'flex':'none';
     // sidebar stats
     var ss=document.getElementById('prop-sidebar-stats');
     ss.innerHTML='';
     var sideStats=[];
-    if(p.beds)sideStats.push({val:p.beds,lbl:'Bedrooms'});
-    if(p.baths)sideStats.push({val:p.baths,lbl:'Bathrooms'});
-    if(p.sqm)sideStats.push({val:p.sqm+' m²',lbl:'Living area'});
-    if(p.type)sideStats.push({val:p.type,lbl:'Type'});
-    sideStats.forEach(function(s){var d=document.createElement('div');d.className='prop-sstat';d.innerHTML='<span class="prop-sstat-val">'+s.val+'</span><span class="prop-sstat-lbl">'+s.lbl+'</span>';ss.appendChild(d);});
+    if(p.beds)sideStats.push({val:p.beds,lbl:'Bedrooms',icon:SI.bed});
+    if(p.baths)sideStats.push({val:p.baths,lbl:'Bathrooms',icon:SI.bath});
+    if(p.sqm)sideStats.push({val:p.sqm+' m²',lbl:'Living area',icon:SI.sqm});
+    if(p.type)sideStats.push({val:p.type,lbl:'Type',icon:SI.home});
+    sideStats.forEach(function(s){var d=document.createElement('div');d.className='prop-sstat';d.innerHTML='<span class="prop-sstat-icon">'+s.icon+'</span><span class="prop-sstat-val">'+s.val+'</span><span class="prop-sstat-lbl">'+s.lbl+'</span>';ss.appendChild(d);});
     ss.style.display=sideStats.length?'grid':'none';
     // description
     var dw=document.getElementById('prop-desc-wrap');
@@ -826,21 +842,19 @@ html[lang="el"] [data-el]{display:revert}
     var fl=document.getElementById('prop-features-list');
     fl.innerHTML='';
     if(p.features&&p.features.length){
-      var iconMap=[
-        {k:'location',i:'📍'},{k:'central',i:'📍'},{k:'lycabettus',i:'⛰️'},
-        {k:'studio',i:'🏠'},{k:'floor',i:'🏠'},{k:'apartment',i:'🏢'},{k:'villa',i:'🏡'},
-        {k:'pool',i:'🏊'},{k:'sea',i:'🌊'},{k:'view',i:'🌅'},{k:'acropolis',i:'🏛️'},
-        {k:'parking',i:'🚗'},{k:'garden',i:'🌿'},{k:'terrace',i:'☀️'},{k:'balcony',i:'☀️'},
-        {k:'quiet',i:'🔇'},{k:'safe',i:'🔒'},{k:'security',i:'🔒'},
-        {k:'workation',i:'💻'},{k:'work',i:'💼'},{k:'remote',i:'💻'},
-        {k:'kolonaki',i:'🗺️'},{k:'syntagma',i:'🗺️'},{k:'close',i:'📌'},{k:'near',i:'📌'},
-        {k:'furnished',i:'🛋️'},{k:'new',i:'✨'},{k:'renovated',i:'🔨'},
-        {k:'wifi',i:'📶'},{k:'internet',i:'📶'},{k:'air',i:'❄️'}
+      var featIconMap=[
+        {k:'location',i:SI.pin},{k:'central',i:SI.pin},{k:'lycabettus',i:SI.pin},
+        {k:'studio',i:SI.home},{k:'floor',i:SI.home},{k:'apartment',i:SI.home},{k:'villa',i:SI.home},
+        {k:'quiet',i:SI.shield},{k:'safe',i:SI.shield},{k:'security',i:SI.shield},
+        {k:'workation',i:SI.laptop},{k:'work',i:SI.laptop},{k:'remote',i:SI.laptop},
+        {k:'kolonaki',i:SI.map},{k:'syntagma',i:SI.map},{k:'close',i:SI.map},{k:'near',i:SI.map},
+        {k:'pool',i:SI.bath},{k:'sea',i:SI.map},{k:'acropolis',i:SI.pin}
       ];
       p.features.forEach(function(f){
         var text=typeof f==='object'?f.text:f;
-        var icon=typeof f==='object'&&f.icon?f.icon:'';
-        if(!icon){var lower=text.toLowerCase();for(var m=0;m<iconMap.length;m++){if(lower.indexOf(iconMap[m].k)>=0){icon=iconMap[m].i;break;}}if(!icon)icon='✔️';}
+        var icon=SI.check;
+        var lower=text.toLowerCase();
+        for(var m=0;m<featIconMap.length;m++){if(lower.indexOf(featIconMap[m].k)>=0){icon=featIconMap[m].i;break;}}
         var li=document.createElement('li');
         li.innerHTML='<span class="feat-icon">'+icon+'</span><span>'+text+'</span>';
         fl.appendChild(li);
