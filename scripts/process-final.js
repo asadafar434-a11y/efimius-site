@@ -8,15 +8,22 @@ const outputDir = 'C:/Users/evgenii/Downloads/gmail12_final';
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
 
 function makeWatermarkSvg(width, height) {
-  const fontSize = Math.round(Math.min(width, height) * 0.042);
+  const cx = width / 2;
+  const cy = height / 2;
+  const fs1 = Math.round(Math.min(width, height) * 0.13);  // "99" big
+  const fs2 = Math.round(Math.min(width, height) * 0.055); // "properties" small
+  const gap = Math.round(fs1 * 0.55);
   return Buffer.from(`<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-  <text x="${width - 16}" y="${height - 14}" text-anchor="end"
-    font-family="Arial, sans-serif" font-weight="700" font-size="${fontSize}"
-    letter-spacing="0.05em"
-    fill="white" opacity="0.6"
-    stroke="rgba(0,0,0,0.35)" stroke-width="2.5" paint-order="stroke">
-    99 properties
-  </text>
+  <g opacity="0.38" transform="translate(${cx},${cy})">
+    <text x="0" y="${-gap * 0.3}" text-anchor="middle" dominant-baseline="middle"
+      font-family="Arial, sans-serif" font-weight="900" font-size="${fs1}"
+      letter-spacing="0.04em" fill="white"
+      stroke="rgba(0,0,0,0.4)" stroke-width="3" paint-order="stroke">99</text>
+    <text x="0" y="${gap}" text-anchor="middle" dominant-baseline="middle"
+      font-family="Arial, sans-serif" font-weight="700" font-size="${fs2}"
+      letter-spacing="0.18em" fill="white"
+      stroke="rgba(0,0,0,0.4)" stroke-width="2" paint-order="stroke">PROPERTIES</text>
+  </g>
 </svg>`);
 }
 
