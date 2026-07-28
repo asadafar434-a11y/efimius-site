@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const wDir = 'C:/Users/evgenii/Downloads/gmail12_resized';
+const wDir = 'C:/Users/evgenii/Downloads/gmail12_final';
 
 // Load watermarked photos as base64
 const files = fs.readdirSync(wDir).filter(f => f.endsWith('.jpg')).sort();
