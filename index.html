@@ -674,7 +674,7 @@ html[lang="el"] [data-el]{display:revert}
 <main id="prop" hidden>
   <div class="prop-hero">
     <div class="prop-topbar">
-      <a class="prop-back" onclick="showView('site');history.back();return false;" href="#">
+      <a class="prop-back" onclick="showView('site');history.pushState({view:'site'},'',location.pathname);return false;" href="#">
         <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         <span data-en>Back to listings</span><span data-el>Πίσω</span><span data-tr>Geri</span><span data-zh>返回</span>
       </a>
