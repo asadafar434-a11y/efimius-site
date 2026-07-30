@@ -382,40 +382,54 @@ async function publish() {
     });
     showProgress(35);
 
-    // 2. Get latest commit SHA on main
-    showStatus('Получаю последний коммит...', 'info');
-    const ref = await ghGet('/repos/' + REPO + '/git/ref/heads/main');
-    const latestCommitSha = ref.object.sha;
-    showProgress(50);
+    // Steps 2-6 retried on "not a fast forward" (stale ref between read and update)
+    let lastErr = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        // 2. Get latest commit SHA on main
+        showStatus('Получаю последний коммит...' + (attempt > 1 ? ' (попытка ' + attempt + ')' : ''), 'info');
+        const ref = await ghGet('/repos/' + REPO + '/git/ref/heads/main');
+        const latestCommitSha = ref.object.sha;
+        showProgress(50);
 
-    // 3. Get tree of latest commit
-    const latestCommit = await ghGet('/repos/' + REPO + '/git/commits/' + latestCommitSha);
-    const baseTreeSha = latestCommit.tree.sha;
-    showProgress(60);
+        // 3. Get tree of latest commit
+        const latestCommit = await ghGet('/repos/' + REPO + '/git/commits/' + latestCommitSha);
+        const baseTreeSha = latestCommit.tree.sha;
+        showProgress(60);
 
-    // 4. Create new tree with updated file
-    showStatus('Создаю дерево...', 'info');
-    const newTree = await ghPost('/repos/' + REPO + '/git/trees', {
-      base_tree: baseTreeSha,
-      tree: [{ path: FILE, mode: '100644', type: 'blob', sha: blob.sha }]
-    });
-    showProgress(75);
+        // 4. Create new tree with updated file
+        showStatus('Создаю дерево...', 'info');
+        const newTree = await ghPost('/repos/' + REPO + '/git/trees', {
+          base_tree: baseTreeSha,
+          tree: [{ path: FILE, mode: '100644', type: 'blob', sha: blob.sha }]
+        });
+        showProgress(75);
 
-    // 5. Create commit
-    showStatus('Создаю коммит...', 'info');
-    const newCommit = await ghPost('/repos/' + REPO + '/git/commits', {
-      message: 'Update gallery via admin panel',
-      tree: newTree.sha,
-      parents: [latestCommitSha]
-    });
-    showProgress(88);
+        // 5. Create commit
+        showStatus('Создаю коммит...', 'info');
+        const newCommit = await ghPost('/repos/' + REPO + '/git/commits', {
+          message: 'Update gallery via admin panel',
+          tree: newTree.sha,
+          parents: [latestCommitSha]
+        });
+        showProgress(88);
 
-    // 6. Update branch ref
-    showStatus('Обновляю ветку...', 'info');
-    await ghPost('/repos/' + REPO + '/git/refs/heads/main', {
-      sha: newCommit.sha,
-      force: false
-    }, 'PATCH');
+        // 6. Update branch ref
+        showStatus('Обновляю ветку...', 'info');
+        await ghPost('/repos/' + REPO + '/git/refs/heads/main', {
+          sha: newCommit.sha,
+          force: false
+        }, 'PATCH');
+        lastErr = null;
+        break;
+      } catch(err) {
+        lastErr = err;
+        if (err.message.indexOf('fast forward') === -1) throw err;
+        // stale ref — wait a moment and retry with a fresh one
+        await new Promise(function(r){ setTimeout(r, 1200); });
+      }
+    }
+    if (lastErr) throw lastErr;
     showProgress(100);
 
     showStatus('✅ Опубликовано! Сайт обновится через 1-2 минуты.', 'ok');
@@ -426,7 +440,7 @@ async function publish() {
 
 // ---- GITHUB API ----
 async function ghGet(path) {
-  const r = await fetch(API + path, { headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' } });
+  const r = await fetch(API + path, { cache: 'no-store', headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' } });
   if (!r.ok) throw new Error(r.status + ' ' + (await r.text()));
   return r.json();
 }
